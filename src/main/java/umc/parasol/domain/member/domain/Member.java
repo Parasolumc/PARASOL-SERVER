@@ -21,7 +21,6 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @NotNull(message = "관련 uuid가 설정되어 있어야 합니다.")
     @Column(unique = true)
     private Long uuid;
 
