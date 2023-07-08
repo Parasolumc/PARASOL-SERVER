@@ -1,7 +1,0 @@
-app:
-  auth:
-    token-secret: 9742F6BEC9F62596C2FFEFF9FA0B9E39303554C06F94AB9B85C8090E3EE87F3CF0BE4BFA244C625E3F691321F9CFF38C228C4C3C91105C23919B16F7E40BE4EC
-    access-token-expiration-msec: 3600000
-    refresh-token-expiration-msec: 1209600000
-  cors:
-    allowed-origins: http://localhost:3000, http://localhost:8080
