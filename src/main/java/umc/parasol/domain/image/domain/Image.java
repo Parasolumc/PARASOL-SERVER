@@ -22,7 +22,7 @@ public class Image extends BaseEntity {
     @NotBlank(message = "관련 파일 url이 설정되어 있어야 합니다.")
     private String url;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
     @NotNull(message = "관련 상점이 설정되어 있어야 합니다.")
     private Shop shop;
