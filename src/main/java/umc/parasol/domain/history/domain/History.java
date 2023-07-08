@@ -24,17 +24,17 @@ public class History extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull(message = "관련 멤버가 설정되어 있어야 합니다.")
     @JoinColumn(name = "member_id")
     private Member member;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull(message = "관련 상점이 설정되어 있어야 합니다.")
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull(message = "관련 우산이 설정되어 있아야 합니다.")
     @JoinColumn(name = "umbrella_id")
     private Umbrella umbrella;
