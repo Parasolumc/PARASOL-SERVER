@@ -36,8 +36,13 @@ out/
 ### VS Code ###
 .vscode/
 
+/src/main/resources
+/src/main/resources/auth/
+/src/main/resources/database/
 ### MAC ###
 .DS_Store
 
 ### ELSE ###
 application.yml
+/src/main/resources/database/application-database.yml
+/src/main/resources/auth/application-auth.yml
