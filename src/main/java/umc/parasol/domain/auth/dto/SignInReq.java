@@ -9,10 +9,10 @@ import lombok.Data;
 public class SignInReq {
 
     @NotBlank
-    @Email
+    @Email(message = "이메일 형식이어야 합니다.")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력해야 합니다.")
     private String password;
 
 }

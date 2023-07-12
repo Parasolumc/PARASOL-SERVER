@@ -57,6 +57,6 @@ public class Naver extends OAuth2UserInfo {
 
     @Override
     public String getProvider(){
-        return Provider.naver.toString();
+        return Provider.NAVER.toString();
     }
 }

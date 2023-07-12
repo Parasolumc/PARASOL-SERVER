@@ -7,26 +7,44 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import umc.parasol.domain.auth.application.AuthService;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import umc.parasol.domain.auth.application.AuthSignService;
+import umc.parasol.domain.auth.application.AuthTokenService;
+import umc.parasol.domain.auth.dto.AuthRes;
 import umc.parasol.domain.auth.dto.RefreshTokenReq;
 import umc.parasol.domain.auth.dto.SignInReq;
 import umc.parasol.domain.auth.dto.SignUpReq;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
+import umc.parasol.global.payload.ApiResponse;
+import umc.parasol.global.payload.Message;
+
+import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthSignService authService;
+
+    private final AuthTokenService authTokenService;
 
     //회원가입
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(
             @Valid @RequestBody SignUpReq signUpReq) {
-        System.out.println("gg");
-        return authService.signUp(signUpReq);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/users")
+                .buildAndExpand(authService.signUp(signUpReq)).toUri();
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(Message.builder().message("회원가입에 성공했습니다").build())
+                .build();
+
+        return ResponseEntity.created(location).body(apiResponse);
     }
 
     //로그인
@@ -34,7 +52,14 @@ public class AuthController {
     public ResponseEntity<?> signIn(
             @Valid @RequestBody SignInReq signInReq) {
 
-        return authService.signIn(signInReq);
+        AuthRes authRes = authService.signIn(signInReq);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(authRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
     //로그아웃
@@ -43,7 +68,14 @@ public class AuthController {
             @CurrentUser UserPrincipal userPrincipal,
             @Valid @RequestBody RefreshTokenReq refreshTokenReq){
 
-        return authService.signOut(refreshTokenReq);
+        authService.signOut(refreshTokenReq);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(Message.builder().message("로그아웃 되었습니다.").build())
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
     //토큰 리프레시
@@ -51,6 +83,13 @@ public class AuthController {
     public ResponseEntity<?> refresh(
             @Valid @RequestBody RefreshTokenReq tokenRefreshRequest){
 
-        return authService.refresh(tokenRefreshRequest);
+        AuthRes authRes = authTokenService.refresh(tokenRefreshRequest);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(authRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 }

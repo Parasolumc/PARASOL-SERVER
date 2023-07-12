@@ -9,14 +9,14 @@ import lombok.Data;
 @AllArgsConstructor
 public class SignUpReq {
 
-    @NotBlank
+    @NotBlank(message = "이름을 입력해야 합니다.")
     private String nickname;
 
     @NotBlank
-    @Email
+    @Email(message = "이메일 형식이어야 합니다.")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력해야 합니다.")
     private String password;
 
     //추후 결제수단..?
