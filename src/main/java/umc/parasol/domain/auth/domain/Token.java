@@ -14,10 +14,10 @@ import lombok.Getter;
 public class Token extends BaseEntity {
 
     @Id
-    @Column(name = "user_email", length = 1024 , nullable = false)
+    @Column(name = "user_email", length = 767 , nullable = false)
     private String userEmail;
 
-    @Column(name = "refresh_token", length = 1024 , nullable = false)
+    @Column(name = "refresh_token", length = 767 , nullable = false)
     private String refreshToken;
 
     public Token(){}
