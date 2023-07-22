@@ -21,9 +21,6 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    //providerId로 대채
-    //private Long uuid;
-
     @Column(unique = true)
     private String nickname;
 
@@ -38,9 +35,6 @@ public class Member extends BaseEntity {
     @NotNull(message = "역할이 설정되어 있어야 합니다.")
     private Role role;
 
-    @NotNull(message = "인증 여부가 설정되어 있어야 합니다.")
-    private Boolean isVerified;
-
     @Enumerated(EnumType.STRING)
     private AuthRole authRole;
 
@@ -50,11 +44,20 @@ public class Member extends BaseEntity {
     @Column(unique = true)
     private String providerId;
 
+    // 인증 관련 필드
+    @NotNull(message = "인증 여부가 설정되어 있어야 합니다.")
+    private Boolean isVerified;
 
-    // @Setter 대신에 사용하는 업데이트 메소드 //
+    private String name;
+
+    private String phoneNumber;
+
+
+    // update 메서드
     public void updateNickname(String nickname){this.nickname = nickname;}
 
     public void updatePassword(String password){this.password = password;}
 
     public void updateIsVerified(Boolean isVerified) {this.isVerified = isVerified;}
+
 }
