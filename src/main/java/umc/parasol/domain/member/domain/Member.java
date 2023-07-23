@@ -52,7 +52,6 @@ public class Member extends BaseEntity {
 
     private String phoneNumber;
 
-
     // update 메서드
     public void updateNickname(String nickname){this.nickname = nickname;}
 
@@ -60,4 +59,11 @@ public class Member extends BaseEntity {
 
     public void updateIsVerified(Boolean isVerified) {this.isVerified = isVerified;}
 
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }

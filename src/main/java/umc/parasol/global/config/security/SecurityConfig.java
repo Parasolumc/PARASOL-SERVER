@@ -89,6 +89,8 @@ public class SecurityConfig {
                         .permitAll()
                     .requestMatchers("/auth/**")
                         .permitAll()
+                    .requestMatchers("/verify/**")
+                        .permitAll()
                     .anyRequest()
                         .authenticated()
                     .and()
