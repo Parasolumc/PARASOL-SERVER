@@ -47,11 +47,18 @@ public class VerifyService {
         int code = generateVerifyCode();
         Member findMember = findMemberByEmail(verifyReq.getEmail());
         updateMemberNumberAndName(verifyReq, findMember);
+        removePreviousVerifies(findMember);
         Verify newVerify = createVerify(code, findMember);
         verifyRepository.save(newVerify);
         sendMessage(verifyReq, code);
 
         return new ApiResponse(true, newVerify);
+    }
+
+    private void removePreviousVerifies(Member findMember) {
+        Verify findVerify = verifyRepository.findByMember(findMember);
+        if (findVerify != null)
+            verifyRepository.delete(findVerify);
     }
 
     private static Verify createVerify(int code, Member findMember) {
