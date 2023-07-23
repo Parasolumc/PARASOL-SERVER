@@ -34,7 +34,7 @@ public class VerifyController {
     public ResponseEntity<?> check(@Valid @RequestBody CheckReq checkReq) {
         try {
             return ResponseEntity.ok(verifyService.check(checkReq));
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException | UsernameNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

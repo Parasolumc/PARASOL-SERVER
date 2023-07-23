@@ -45,22 +45,31 @@ public class VerifyService {
     @Transactional
     public ApiResponse verify(VerifyReq verifyReq) {
         int code = generateVerifyCode();
-
         Member findMember = findMemberByEmail(verifyReq.getEmail());
-        findMember.updatePhoneNumber(verifyReq.getPhoneNumber());
-        findMember.updateName(verifyReq.getName());
+        updateMemberNumberAndName(verifyReq, findMember);
+        Verify newVerify = createVerify(code, findMember);
+        verifyRepository.save(newVerify);
+        sendMessage(verifyReq, code);
 
-        Verify newVerify = Verify.builder()
+        return new ApiResponse(true, newVerify);
+    }
+
+    private static Verify createVerify(int code, Member findMember) {
+        return Verify.builder()
                 .code(code)
                 .member(findMember)
                 .build();
+    }
 
-        verifyRepository.save(newVerify);
+    private void sendMessage(VerifyReq verifyReq, int code) {
         DefaultMessageService messageService = INSTANCE.initialize(MessageApiKey, MessageSecretKey, MessageDomain);
         Message newMessage = generateVerifyMessage(verifyReq.getPhoneNumber(), code);
         messageService.sendOne(new SingleMessageSendingRequest(newMessage));
+    }
 
-        return new ApiResponse(true, newVerify);
+    private static void updateMemberNumberAndName(VerifyReq verifyReq, Member findMember) {
+        findMember.updatePhoneNumber(verifyReq.getPhoneNumber());
+        findMember.updateName(verifyReq.getName());
     }
 
     // 문자 인증 확인
@@ -68,13 +77,21 @@ public class VerifyService {
     public ApiResponse check(CheckReq checkReq) {
         Verify findVerify = verifyRepository.findByCode(checkReq.getCode())
                 .orElseThrow(() -> new IllegalArgumentException("코드가 일치하지 않습니다."));
+
         LocalDateTime requestTime = LocalDateTime.now();
         if (findVerify.checkExpiration(requestTime)) {
             verifyRepository.delete(findVerify);
             throw new IllegalStateException("인증 시간이 만료되었습니다.");
         }
 
+        Member existMember = findMemberByPhoneNumber(checkReq.getPhoneNumber());
         Member findMember = findVerify.getMember();
+        if (!existMember.getId().equals(findMember.getId()))
+            throw new IllegalStateException("유저 정보가 일치하지 않습니다.");
+
+        if (findMember.getIsVerified())
+            throw new IllegalStateException("이미 인증되었습니다.");
+
         findMember.updateIsVerified(true);
 
         verifyRepository.delete(findVerify);
@@ -85,6 +102,11 @@ public class VerifyService {
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(
                 () -> new UsernameNotFoundException("유저 정보를 찾을 수 없습니다."));
+    }
+
+    private Member findMemberByPhoneNumber(String phoneNumber) {
+        return memberRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new UsernameNotFoundException("유저 정보를 찾을 수 없습니다."));
     }
 
     // 문자 인증 코드 생성
