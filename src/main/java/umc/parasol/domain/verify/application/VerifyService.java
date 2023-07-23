@@ -56,7 +56,7 @@ public class VerifyService {
     }
 
     private void removePreviousVerifies(Member findMember) {
-        Verify findVerify = verifyRepository.findByMember(findMember);
+        Verify findVerify = verifyRepository.findByMemberId(findMember.getId());
         if (findVerify != null)
             verifyRepository.delete(findVerify);
     }
