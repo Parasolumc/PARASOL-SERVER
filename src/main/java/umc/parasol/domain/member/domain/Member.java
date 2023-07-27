@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Where;
 import umc.parasol.domain.common.BaseEntity;
+import umc.parasol.domain.shop.domain.Shop;
 
 @Entity
 @Builder
@@ -51,6 +52,10 @@ public class Member extends BaseEntity {
     private String name;
 
     private String phoneNumber;
+
+    @OneToOne
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
 
     // update 메서드
     public void updateNickname(String nickname){this.nickname = nickname;}

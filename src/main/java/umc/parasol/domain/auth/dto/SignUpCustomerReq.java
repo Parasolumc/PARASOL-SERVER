@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignUpReq {
+public class SignUpCustomerReq {
 
     @NotBlank(message = "이름을 입력해야 합니다.")
     private String nickname;
