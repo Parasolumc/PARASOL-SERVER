@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import umc.parasol.domain.image.application.ImageService;
 import umc.parasol.domain.shop.application.ShopService;
 import umc.parasol.domain.shop.dto.ShopListRes;
+import umc.parasol.domain.shop.dto.ShopRes;
 import umc.parasol.domain.shop.dto.UpdateUmbrellaReq;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
@@ -21,9 +22,10 @@ import java.util.List;
 public class ShopController {
 
     private final ShopService shopService;
+
     private final ImageService imageService;
 
-    // 매장 조회
+    // 매장 리스트 조회
     @GetMapping
     public ResponseEntity<?> getShopList(
             @CurrentUser UserPrincipal userPrincipal) {
@@ -33,6 +35,22 @@ public class ShopController {
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
                 .information(shopListRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    // 특정 매장 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getShop(
+            @CurrentUser UserPrincipal userPrincipal,
+            @PathVariable(value = "id") Long shopId) {
+
+        ShopRes shopRes = shopService.getShop(userPrincipal, shopId);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(shopRes)
                 .build();
 
         return ResponseEntity.ok(apiResponse);

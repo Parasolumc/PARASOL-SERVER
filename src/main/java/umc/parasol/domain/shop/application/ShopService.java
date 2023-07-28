@@ -5,12 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.parasol.domain.image.domain.Image;
+import umc.parasol.domain.image.domain.repository.ImageRepository;
+import umc.parasol.domain.image.dto.ImageRes;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.ShopListRes;
+import umc.parasol.domain.shop.dto.ShopRes;
 import umc.parasol.domain.shop.dto.UpdateUmbrellaReq;
 import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
@@ -26,6 +30,8 @@ public class ShopService {
     private final MemberRepository memberRepository;
 
     private final ShopRepository shopRepository;
+
+    private final ImageRepository imageRepository;
 
     /**
      * 매장 리스트 조회
@@ -51,6 +57,44 @@ public class ShopService {
                         .unavailableUmbrella(shop.getUnavailableUmbrella())
                         .build()
         ).toList();
+    }
+
+    /**
+     * 특정 매장 조회
+     *
+     * @param userPrincipal api 호출하는 사용자 객체
+     * @param shopId 조회할 매장의 ID
+     */
+    public ShopRes getShop(UserPrincipal userPrincipal, Long shopId) {
+
+        Optional<Member> member = memberRepository.findById(userPrincipal.getId());
+        DefaultAssert.isTrue(member.isPresent(), "유저가 올바르지 않습니다.");
+
+        Optional<Shop> shop = shopRepository.findById(shopId);
+        DefaultAssert.isTrue(shop.isPresent(), "매장이 올바르지 않습니다.");
+        Shop findShop = shop.get();
+
+        List<Image> imageList = imageRepository.findAllByShop(findShop);
+
+        List<ImageRes> imageResList = imageList.stream().map(
+                image -> ImageRes.builder()
+                        .id(image.getId())
+                        .url(image.getUrl())
+                        .build()
+        ).toList();
+
+        return ShopRes.builder()
+                .id(findShop.getId())
+                .shopName(findShop.getName())
+                .desc(findShop.getDescription())
+                .latitude(findShop.getLatitude())
+                .longitude(findShop.getLongitude())
+                .roadNameAddress(findShop.getRoadNameAddress())
+                .openTime(findShop.getOpenTime())
+                .closeTime(findShop.getCloseTime())
+                .availableUmbrella(findShop.getAvailableUmbrella())
+                .imageRes(imageResList)
+                .build();
     }
 
     /**
