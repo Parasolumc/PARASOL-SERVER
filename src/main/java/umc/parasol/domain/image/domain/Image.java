@@ -17,6 +17,7 @@ public class Image extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "image_id")
     private Long id;
 
     @NotBlank(message = "관련 파일 url이 설정되어 있어야 합니다.")
@@ -27,7 +28,8 @@ public class Image extends BaseEntity {
     @NotNull(message = "관련 상점이 설정되어 있어야 합니다.")
     private Shop shop;
 
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "관련 타입이 설정되어 있어야 합니다.")
-    private Type type;
+    public Image(String url, Shop shop) {
+        this.url = url;
+        this.shop = shop;
+    }
 }

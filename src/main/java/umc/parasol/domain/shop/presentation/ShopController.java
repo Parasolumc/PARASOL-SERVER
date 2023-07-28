@@ -1,8 +1,11 @@
 package umc.parasol.domain.shop.presentation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import umc.parasol.domain.image.application.ImageService;
 import umc.parasol.domain.shop.application.ShopService;
 import umc.parasol.domain.shop.dto.ShopListRes;
 import umc.parasol.domain.shop.dto.UpdateUmbrellaReq;
@@ -18,6 +21,7 @@ import java.util.List;
 public class ShopController {
 
     private final ShopService shopService;
+    private final ImageService imageService;
 
     // 매장 조회
     @GetMapping
@@ -49,5 +53,16 @@ public class ShopController {
                 .build();
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+    // 매장 사진 업로드
+    @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> imageUpload(@RequestParam(value = "image")
+                                         MultipartFile file, @PathVariable Long id, @CurrentUser UserPrincipal user) {
+        try {
+            return ResponseEntity.ok(imageService.upload(id, file, user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
