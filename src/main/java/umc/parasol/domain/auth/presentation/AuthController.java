@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import umc.parasol.domain.auth.application.AuthSignService;
 import umc.parasol.domain.auth.application.AuthTokenService;
-import umc.parasol.domain.auth.dto.AuthRes;
-import umc.parasol.domain.auth.dto.RefreshTokenReq;
-import umc.parasol.domain.auth.dto.SignInReq;
-import umc.parasol.domain.auth.dto.SignUpReq;
+import umc.parasol.domain.auth.dto.*;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
@@ -30,14 +27,31 @@ public class AuthController {
 
     private final AuthTokenService authTokenService;
 
-    //회원가입
-    @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(
-            @Valid @RequestBody SignUpReq signUpReq) {
+    //회원가입 (일반 사용자-customer)
+    @PostMapping("/sign-up/customer")
+    public ResponseEntity<?> signUpCustomer(
+            @Valid @RequestBody SignUpCustomerReq signUpReq) {
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/users")
-                .buildAndExpand(authService.signUp(signUpReq)).toUri();
+                .buildAndExpand(authService.signUpCustomer(signUpReq)).toUri();
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(Message.builder().message("회원가입에 성공했습니다").build())
+                .build();
+
+        return ResponseEntity.created(location).body(apiResponse);
+    }
+
+    //회원가입 (사장님-owner)
+    @PostMapping("/sign-up/owner")
+    public ResponseEntity<?> signUpOwner(
+            @Valid @RequestBody SignUpOwnerReq signUpOwnerReq) {
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/users")
+                .buildAndExpand(authService.signUpOwner(signUpOwnerReq)).toUri();
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)

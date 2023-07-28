@@ -14,6 +14,8 @@ import umc.parasol.domain.member.domain.AuthRole;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.shop.domain.Shop;
+import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.global.DefaultAssert;
 
 import java.util.Optional;
@@ -33,11 +35,15 @@ public class AuthSignService {
 
     private final CustomTokenProviderService customTokenProviderService;
 
+    private final ShopRepository shopRepository;
+
+
     //회원가입 (일반 사용자-customer)
     @Transactional
-    public Long signUp(SignUpReq signUpReq) {
+    public Long signUpCustomer(SignUpCustomerReq signUpReq) {
         DefaultAssert.isTrue(!memberRepository.existsByEmail(signUpReq.getEmail()), "해당 이메일이 존재합니다.");
 
+        // 멤버 객체 생성
         Member member = Member.builder()
                 .nickname(signUpReq.getNickname())
                 .email(signUpReq.getEmail())
@@ -50,6 +56,37 @@ public class AuthSignService {
         memberRepository.save(member);
 
         return member.getId();
+    }
+
+    // 회원가입 (사장님-owner)
+    public Long signUpOwner(SignUpOwnerReq signUpOwnerReq) {
+        DefaultAssert.isTrue(!memberRepository.existsByEmail(signUpOwnerReq.getEmail()), "해당 이메일이 존재합니다.");
+
+        // 매장 객체 생성
+        Shop newShop = Shop.builder()
+                .name(signUpOwnerReq.getShopName())
+                .latitude(signUpOwnerReq.getLatitude())
+                .longitude(signUpOwnerReq.getLongitude())
+                .roadNameAddress(signUpOwnerReq.getRoadNameAddress())
+                .build();
+
+        shopRepository.save(newShop);
+
+        // 멤버 객체 생성
+        Member member = Member.builder()
+                .nickname(signUpOwnerReq.getNickname())
+                .email(signUpOwnerReq.getEmail())
+                .password(passwordEncoder.encode(signUpOwnerReq.getPassword()))
+                .role(Role.OWNER)
+                .authRole(AuthRole.USER)
+                .isVerified(Boolean.FALSE)
+                .shop(newShop)
+                .build();
+
+        memberRepository.save(member);
+
+        return member.getId();
+
     }
 
     //로그인
