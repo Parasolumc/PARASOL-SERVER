@@ -48,6 +48,7 @@ public class ShopService {
                         .openTime(shop.getOpenTime())
                         .closeTime(shop.getCloseTime())
                         .availableUmbrella(shop.getAvailableUmbrella())
+                        .unavailableUmbrella(shop.getUnavailableUmbrella())
                         .build()
         ).toList();
     }
@@ -82,6 +83,7 @@ public class ShopService {
                 .openTime(findShop.getOpenTime())
                 .closeTime(findShop.getCloseTime())
                 .availableUmbrella(findShop.getAvailableUmbrella())
+                .unavailableUmbrella(findShop.getUnavailableUmbrella())
                 .build();
     }
 }

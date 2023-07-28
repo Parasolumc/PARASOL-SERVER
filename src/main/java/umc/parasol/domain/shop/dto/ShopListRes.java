@@ -24,8 +24,10 @@ public class ShopListRes {
 
     private int availableUmbrella;
 
+    private int unavailableUmbrella;
+
     @Builder
-    public ShopListRes(Long id, String shopName, BigDecimal latitude, BigDecimal longitude, String roadNameAddress, String openTime, String closeTime, int availableUmbrella) {
+    public ShopListRes(Long id, String shopName, BigDecimal latitude, BigDecimal longitude, String roadNameAddress, String openTime, String closeTime, int availableUmbrella, int unavailableUmbrella) {
         this.id = id;
         this.shopName = shopName;
         this.latitude = latitude;
@@ -34,6 +36,7 @@ public class ShopListRes {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.availableUmbrella = availableUmbrella;
+        this.unavailableUmbrella = unavailableUmbrella;
     }
 
 }
