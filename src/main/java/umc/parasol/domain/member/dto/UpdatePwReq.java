@@ -12,4 +12,6 @@ public class UpdatePwReq {
     @NotBlank(message = "새 비밀번호를 입력해야 합니다.")
     private String newPw;
 
+    @NotBlank(message = "refresh token을 입력해야 합니다.")
+    private String refreshToken;
 }
