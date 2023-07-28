@@ -68,6 +68,8 @@ public class AuthSignService {
                 .latitude(signUpOwnerReq.getLatitude())
                 .longitude(signUpOwnerReq.getLongitude())
                 .roadNameAddress(signUpOwnerReq.getRoadNameAddress())
+                .availableUmbrella(0)
+                .unavailableUmbrella(0)
                 .build();
 
         shopRepository.save(newShop);

@@ -10,7 +10,6 @@ import org.hibernate.annotations.Where;
 import umc.parasol.domain.common.BaseEntity;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.shop.domain.Shop;
-import umc.parasol.domain.umbrella.domain.Umbrella;
 
 @Entity
 @Builder
@@ -33,11 +32,6 @@ public class History extends BaseEntity {
     @NotNull(message = "관련 상점이 설정되어 있어야 합니다.")
     @JoinColumn(name = "shop_id")
     private Shop shop;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @NotNull(message = "관련 우산이 설정되어 있아야 합니다.")
-    @JoinColumn(name = "umbrella_id")
-    private Umbrella umbrella;
 
     @NotNull(message = "가격이 설정되어 있어야 합니다.")
     private Long cost;
