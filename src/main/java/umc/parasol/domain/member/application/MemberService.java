@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.auth.application.AuthSignService;
-import umc.parasol.domain.auth.domain.repository.TokenRepository;
 import umc.parasol.domain.auth.dto.RefreshTokenReq;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
@@ -22,7 +21,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthSignService authSignService;
-    private final TokenRepository tokenRepository;
 
     // 비밀번호 변경
     @Transactional
