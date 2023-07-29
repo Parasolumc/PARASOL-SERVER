@@ -13,9 +13,7 @@ import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
-import umc.parasol.domain.shop.dto.ShopListRes;
-import umc.parasol.domain.shop.dto.ShopRes;
-import umc.parasol.domain.shop.dto.UpdateUmbrellaReq;
+import umc.parasol.domain.shop.dto.*;
 import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
 
