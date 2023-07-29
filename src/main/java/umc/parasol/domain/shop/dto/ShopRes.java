@@ -29,7 +29,7 @@ public class ShopRes {
 
     private int availableUmbrella;
 
-    private List<ImageRes> imageRes;
+    private List<ImageRes> image;
 
 
 }

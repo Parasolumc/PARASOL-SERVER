@@ -33,19 +33,12 @@ public class ShopSearchService {
      */
     public List<SearchShopRes> getSearchShop(UserPrincipal userPrincipal, SearchShopReq searchShopReq) {
 
-        Optional<Member> member = memberRepository.findById(userPrincipal.getId());
-        DefaultAssert.isTrue(member.isPresent(), "유저가 올바르지 않습니다.");
-
+        findValidMember(userPrincipal.getId());
         List<Shop> searchShopList = shopRepository.searchShopByKeyword(searchShopReq.getKeyword());
 
-        return searchShopList.stream().map(
-                shop -> SearchShopRes.builder()
-                        .id(shop.getId())
-                        .shopName(shop.getName())
-                        .roadNameAddress(shop.getRoadNameAddress())
-                        .distance(calculateDistance(searchShopReq.getUserLatitude(), searchShopReq.getUserLongitude(), shop.getLatitude(), shop.getLongitude()))
-                        .build()
-        ).toList();
+        return searchShopList.stream()
+                .map(shop -> createSearchShopRes(shop, searchShopReq.getUserLatitude(), searchShopReq.getUserLongitude()))
+                .toList();
     }
 
     /**
@@ -83,5 +76,21 @@ public class ShopSearchService {
         }
     }
 
+    // getSearchShop의 응답을 생성해주는 메서드
+    private SearchShopRes createSearchShopRes(Shop shop, BigDecimal userLat, BigDecimal userLon) {
+        String distance = calculateDistance(userLat, userLon, shop.getLatitude(), shop.getLongitude());
+        return SearchShopRes.builder()
+                .id(shop.getId())
+                .shopName(shop.getName())
+                .roadNameAddress(shop.getRoadNameAddress())
+                .distance(distance)
+                .build();
+    }
+
+    // 유효한 사용자인지 체크하는 메서드
+    private Member findValidMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 올바르지 않습니다."));
+    }
 
 }
