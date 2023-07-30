@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import umc.parasol.domain.image.application.ImageService;
+import umc.parasol.domain.shop.application.ShopSearchService;
 import umc.parasol.domain.shop.application.ShopService;
-import umc.parasol.domain.shop.dto.ShopListRes;
-import umc.parasol.domain.shop.dto.UpdateUmbrellaReq;
+import umc.parasol.domain.shop.dto.*;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
@@ -21,9 +21,12 @@ import java.util.List;
 public class ShopController {
 
     private final ShopService shopService;
+
+    private final ShopSearchService shopSearchService;
+
     private final ImageService imageService;
 
-    // 매장 조회
+    // 매장 리스트 조회
     @GetMapping
     public ResponseEntity<?> getShopList(
             @CurrentUser UserPrincipal userPrincipal) {
@@ -33,6 +36,38 @@ public class ShopController {
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
                 .information(shopListRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    // 특정 매장 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getShop(
+            @CurrentUser UserPrincipal userPrincipal,
+            @PathVariable(value = "id") Long shopId) {
+
+        ShopRes shopRes = shopService.getShop(userPrincipal, shopId);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(shopRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    // 매장 검색 결과 조회
+    @GetMapping("/search")
+    public ResponseEntity<?> searchShop(
+            @CurrentUser UserPrincipal userPrincipal,
+            @RequestBody SearchShopReq searchShopReq) {
+
+        List<SearchShopRes> searchShopRes = shopSearchService.getSearchShop(userPrincipal, searchShopReq);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(searchShopRes)
                 .build();
 
         return ResponseEntity.ok(apiResponse);
