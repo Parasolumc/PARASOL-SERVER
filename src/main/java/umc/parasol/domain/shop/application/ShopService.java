@@ -59,21 +59,6 @@ public class ShopService {
         return createShopRes(shop, imageResList);
     }
 
-    /**
-     * 대여 가능한 우산 개수 업데이트
-     * @param userPrincipal api 호출하는 사용자 객체
-     * @param updateUmbrellaReq 우산 개수 업데이트 dto
-     */
-    @Transactional
-    public ShopListRes updateUmbrellaCount(UserPrincipal userPrincipal, UpdateUmbrellaReq updateUmbrellaReq) {
-
-        Member member = findValidMember(userPrincipal.getId());
-        Shop shop = findValidShopForOwner(member);
-        shop.updateAvailableUmbrella(updateUmbrellaReq.getAvailableUmbrella());
-
-        return createShopListRes(shop);
-    }
-
     // 유효한 사용자인지 체크하는 메서드
     private Member findValidMember(Long memberId) {
         return memberRepository.findById(memberId)
@@ -102,8 +87,6 @@ public class ShopService {
                 .roadNameAddress(shop.getRoadNameAddress())
                 .openTime(shop.getOpenTime())
                 .closeTime(shop.getCloseTime())
-                .availableUmbrella(shop.getAvailableUmbrella())
-                .unavailableUmbrella(shop.getUnavailableUmbrella())
                 .build();
     }
 
@@ -118,7 +101,6 @@ public class ShopService {
                 .roadNameAddress(shop.getRoadNameAddress())
                 .openTime(shop.getOpenTime())
                 .closeTime(shop.getCloseTime())
-                .availableUmbrella(shop.getAvailableUmbrella())
                 .image(imageResList)
                 .build();
     }

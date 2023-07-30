@@ -42,19 +42,4 @@ public class Shop extends BaseEntity {
     private String openTime;
 
     private String closeTime;
-
-    // 매장의 대여 가능한 우산 개수
-    private int availableUmbrella;
-
-    // 매장의 대여 중인 우산 개수 (대여 불가)
-    private int unavailableUmbrella;
-
-    // update 메서드
-    public void updateAvailableUmbrella(int count) {
-        this.availableUmbrella = count;
-    }
-
-    public void updateUnavailableUmbrella(int count) {
-        this.unavailableUmbrella = count;
-    }
 }
