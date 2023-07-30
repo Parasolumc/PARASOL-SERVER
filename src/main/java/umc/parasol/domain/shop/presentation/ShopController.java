@@ -100,4 +100,19 @@ public class ShopController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // 사장님 본인 매장 조회
+    @GetMapping(value = "/owner/{id}")
+    public ResponseEntity<?> getOwnerShop(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long id){
+        try {
+            ShopRes shopListRes = shopService.getShopById(userPrincipal, id);
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .check(true)
+                    .information(shopListRes)
+                    .build();
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
