@@ -62,7 +62,11 @@ public class HistoryService {
         Shop targetShop = findShopById(shopId);
 
         targetUmbrella.updateAvailable(true);
-        targetHistory.updateEndShop(originShop);
+
+        // 빌렸던 지점에 반납 가능하다면 일단 임시로 EndShop으로 등록
+        if (!umbrellaService.isFull(originShop))
+            targetHistory.updateEndShop(originShop);
+
         if (originShop != targetShop) { // 빌렸던 Shop과 다르다면
             if (umbrellaService.isFull(targetShop))
                 throw new IllegalStateException("더 이상 우산을 채울 수 없습니다.");
