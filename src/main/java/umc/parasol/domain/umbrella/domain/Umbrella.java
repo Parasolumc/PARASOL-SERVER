@@ -23,15 +23,14 @@ public class Umbrella extends BaseEntity {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    @Enumerated(value = EnumType.STRING)
-    private Level level;
+    private boolean available;
 
     public static final int MAX = 10;
 
     public static Umbrella createUmbrella(Shop shop) {
         Umbrella newUmbrella = new Umbrella();
         newUmbrella.updateShop(shop);
-        newUmbrella.updateLevel(Level.FREE);
+        newUmbrella.updateAvailable(true);
         return newUmbrella;
     }
 
@@ -39,7 +38,7 @@ public class Umbrella extends BaseEntity {
         this.shop = shop;
     }
 
-    public void updateLevel(Level level) {
-        this.level = level;
+    public void updateAvailable(boolean available) {
+        this.available = available;
     }
 }

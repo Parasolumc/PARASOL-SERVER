@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
-import umc.parasol.domain.umbrella.domain.Level;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
 import umc.parasol.global.config.security.token.UserPrincipal;
@@ -83,7 +82,7 @@ public class UmbrellaService {
     // 매장에 등록된 우산 중 남은 우산이 비어있는지
     private boolean isNoMoreFree(Shop shop) {
         List<Umbrella> umbrellaList = getShopUmbrellaList(shop).stream()
-                .filter(umbrella -> umbrella.getLevel() == Level.FREE).toList();
+                .filter(Umbrella::isAvailable).toList();
         return umbrellaList.isEmpty();
     }
 
@@ -101,7 +100,7 @@ public class UmbrellaService {
     // Shop이 가지고 있는 FREE 상태의 우산 목록 중 0번째 값을 활용
     private Umbrella getAnyFreeUmbrella(Shop shop) {
         return getShopUmbrellaList(shop).stream()
-                .filter(umbrella -> umbrella.getLevel() == Level.FREE)
+                .filter(Umbrella::isAvailable)
                 .toList()
                 .get(0);
     }
