@@ -74,7 +74,7 @@ public class UmbrellaService {
     */
 
    // 한 매장 당 가질 수 있는 우산 갯수가 최대치를 초과했는지
-    private boolean isFull(Shop shop) {
+    public boolean isFull(Shop shop) {
         List<Umbrella> umbrellaList = getShopUmbrellaList(shop);
         return umbrellaList.size() == Umbrella.MAX;
     }
@@ -97,11 +97,19 @@ public class UmbrellaService {
                 .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
     }
 
+    @Transactional
     // Shop이 가지고 있는 FREE 상태의 우산 목록 중 0번째 값을 활용
-    private Umbrella getAnyFreeUmbrella(Shop shop) {
-        return getShopUmbrellaList(shop).stream()
+    public Umbrella getAnyFreeUmbrella(Shop shop) {
+        List<Umbrella> umbrellaList = getShopUmbrellaList(shop).stream()
                 .filter(Umbrella::isAvailable)
-                .toList()
-                .get(0);
+                .toList();
+
+        if (umbrellaList.isEmpty())
+            throw new IllegalStateException("가능한 남은 우산이 없습니다.");
+
+        Umbrella umbrella = umbrellaList.get(0);
+        umbrella.updateAvailable(false);
+
+        return umbrella;
     }
 }
