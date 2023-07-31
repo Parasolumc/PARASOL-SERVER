@@ -73,23 +73,6 @@ public class ShopController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    // 대여 가능 우산 개수 업데이트
-    @PutMapping("/umbrella")
-    public ResponseEntity<?> updateUmbrella(
-            @CurrentUser UserPrincipal userPrincipal,
-            @RequestBody UpdateUmbrellaReq updateUmbrellaReq) {
-
-        ShopListRes shopListRes = shopService.updateUmbrellaCount(userPrincipal, updateUmbrellaReq);
-
-
-        ApiResponse apiResponse = ApiResponse.builder()
-                .check(true)
-                .information(shopListRes)
-                .build();
-
-        return ResponseEntity.ok(apiResponse);
-    }
-
     // 매장 사진 업로드
     @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> imageUpload(@RequestParam(value = "image")
