@@ -7,10 +7,12 @@ import umc.parasol.domain.image.domain.Image;
 import umc.parasol.domain.image.domain.repository.ImageRepository;
 import umc.parasol.domain.image.dto.ImageRes;
 import umc.parasol.domain.member.domain.Member;
+import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.*;
+import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
 
 import java.util.List;
@@ -129,5 +131,34 @@ public class ShopService {
                 .id(image.getId())
                 .url(image.getUrl())
                 .build();
+    }
+
+    /**
+     * 매장 ID로 매장 조회
+     *
+     * @param userPrincipal api 호출하는 사용자 객체
+     * @param shopId            매장 ID
+     */
+    public ShopRes getShopById(UserPrincipal userPrincipal, Long shopId) {
+        Optional<Member> member = memberRepository.findById(userPrincipal.getId());
+        DefaultAssert.isTrue(member.isPresent(), "유저가 올바르지 않습니다.");
+        Member findMember = member.get();
+
+        // 사장님인지 체크
+        DefaultAssert.isTrue(findMember.getRole() == Role.OWNER, "사장님만 매장 정보를 조회할 수 있습니다.");
+
+        Optional<Shop> shop = Optional.ofNullable(findMember.getShop());
+        DefaultAssert.isTrue(shop.isPresent(), "연결된 매장이 없습니다.");
+        Shop findShop = shop.get();
+
+        // 연결된 정보와 매장 정보가 일치하는지 확인
+        DefaultAssert.isTrue(findShop.getId().equals(shopId), "본인의 매장 정보만 조회 가능합니다.");
+
+        List<Image> imageList = imageRepository.findAllByShop(findShop);
+        List<ImageRes> imageResList = imageList.stream()
+                .map(this::createImageRes)
+                .toList();
+
+        return createShopRes(findShop, imageResList);
     }
 }
