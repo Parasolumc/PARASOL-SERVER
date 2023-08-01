@@ -39,20 +39,6 @@ public class UmbrellaService {
         return new ApiResponse(true, "등록 완료");
     }
 
-    /*
-    @Transactional
-    // 손님에게 우산을 빌려주기 (남은 우산이 있어야만 가능)
-    // History와도 관련됨 - HistoryService에서 처리해야 할 수도 있음
-    public void borrow(UserPrincipal user) {
-        Member owner = getShopOwner(user);
-        Shop targetShop = owner.getShop();
-        if (isNoMoreFree(targetShop)) {
-            throw new IllegalStateException("가능한 우산이 없습니다.");
-        }
-        Umbrella umbrella = getAnyFreeUmbrella(targetShop);
-        umbrella.updateLevel(Level.USE);
-    }
-    */
 
     @Transactional
     // 손님이 우산을 판매함
