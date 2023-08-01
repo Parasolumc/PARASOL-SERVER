@@ -25,8 +25,6 @@ public class Umbrella extends BaseEntity {
 
     private boolean available;
 
-    public static final int MAX = 10;
-
     public static Umbrella createUmbrella(Shop shop) {
         Umbrella newUmbrella = new Umbrella();
         newUmbrella.updateShop(shop);
