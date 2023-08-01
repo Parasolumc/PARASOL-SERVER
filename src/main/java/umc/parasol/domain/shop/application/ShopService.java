@@ -155,10 +155,10 @@ public class ShopService {
     /**
      * 매장 정보 수정
      * @param userPrincipal api 호출하는 사용자 객체
-     * @param shopId 매장 ID
      * @param updateInfoReq update할 정보 객체
      */
-    public ShopRes updateInfo(UserPrincipal userPrincipal, Long shopId, UpdateInfoReq updateInfoReq) {
+    @Transactional
+    public ShopRes updateInfo(UserPrincipal userPrincipal, UpdateInfoReq updateInfoReq) {
 
         Member member = findValidMember(userPrincipal.getId());
 
