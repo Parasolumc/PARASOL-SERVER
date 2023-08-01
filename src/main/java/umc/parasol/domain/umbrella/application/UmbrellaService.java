@@ -25,7 +25,7 @@ public class UmbrellaService {
     private final ShopRepository shopRepository;
 
     @Transactional
-    // 초기 세팅 (처음에 Shop 등록했을 시 몇 개 우산 가지고 있는지 설정)
+    // 우산 개수 추가
     public ApiResponse addUmbrella(UserPrincipal user, int count) {
         if (count <= 0)
             throw new IllegalStateException("우산 갯수가 올바르지 않습니다.");
@@ -40,25 +40,6 @@ public class UmbrellaService {
         return new ApiResponse(true, "등록 완료");
     }
 
-
-    @Transactional
-    // 손님이 우산을 판매함
-    public ApiResponse buyUmbrella(UserPrincipal user, Long shopId) {
-        Member owner = getMember(user);
-        Shop targetShop = getShop(shopId);
-        Umbrella newUmbrella = Umbrella.createUmbrella(targetShop);
-        umbrellaRepository.save(newUmbrella);
-
-        return new ApiResponse(true, "판매 완료");
-    }
-
-    /*
-    // 빌린 손님이 반납함 - 원래 매장에 반납하는지, 새 매장에 반납하는지 구분해야 함
-    // History와도 관련됨 - HistoryService에서 처리해야 할 수도 있음
-    public void getBack() {
-
-    }
-    */
 
     // 매장에 등록된 우산 중 남은 우산이 비어있는지
     private boolean isNoMoreFree(Shop shop) {

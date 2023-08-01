@@ -1,21 +1,18 @@
 package umc.parasol.domain.shop.application;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.type.descriptor.java.ShortPrimitiveArrayJavaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.image.domain.Image;
 import umc.parasol.domain.image.domain.repository.ImageRepository;
 import umc.parasol.domain.image.dto.ImageRes;
 import umc.parasol.domain.member.domain.Member;
-import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.*;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
-import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
 
 import javax.swing.text.html.Option;
@@ -67,23 +64,6 @@ public class ShopService {
         return createShopRes(shop, imageResList);
     }
 
-    /**
-     * 본인 매장 조회
-     * @param userPrincipal api 호출하는 사용자 객체
-     */
-    public ShopRes getShopById(UserPrincipal userPrincipal) {
-
-        Member member = findValidMember(userPrincipal.getId());
-
-        Shop shop = findValidShopForOwner(member);
-
-        List<Image> imageList = imageRepository.findAllByShop(shop);
-        List<ImageRes> imageResList = imageList.stream()
-                .map(this::createImageRes)
-                .toList();
-
-        return createShopRes(shop, imageResList);
-    }
 
     // 유효한 사용자인지 체크하는 메서드
     private Member findValidMember(Long memberId) {
@@ -152,6 +132,53 @@ public class ShopService {
                 .id(image.getId())
                 .url(image.getUrl())
                 .build();
+    }
+
+    /**
+     * 본인 매장 조회
+     * @param userPrincipal api 호출하는 사용자 객체
+     */
+    public ShopRes getShopById(UserPrincipal userPrincipal) {
+
+        Member member = findValidMember(userPrincipal.getId());
+
+        Shop shop = findValidShopForOwner(member);
+
+        List<Image> imageList = imageRepository.findAllByShop(shop);
+        List<ImageRes> imageResList = imageList.stream()
+                .map(this::createImageRes)
+                .toList();
+
+        return createShopRes(shop, imageResList);
+    }
+
+    /**
+     * 매장 정보 수정
+     * @param userPrincipal api 호출하는 사용자 객체
+     * @param shopId 매장 ID
+     * @param updateInfoReq update할 정보 객체
+     */
+    public ShopRes updateInfo(UserPrincipal userPrincipal, Long shopId, UpdateInfoReq updateInfoReq) {
+
+        Member member = findValidMember(userPrincipal.getId());
+
+        Shop shop = findValidShopForOwner(member);
+
+        shop.updateDescription(updateInfoReq.getDesc());
+        shop.updateOpenTime(updateInfoReq.getOpenTime());
+        shop.updateCloseTime(updateInfoReq.getCloseTime());
+
+        Shop updatedShop = shopRepository.save(shop);
+
+
+        List<Image> imageList = imageRepository.findAllByShop(updatedShop);
+        List<ImageRes> imageResList = imageList.stream()
+                .map(this::createImageRes)
+                .toList();
+
+        return createShopRes(updatedShop, imageResList);
+
+
     }
 
 }
