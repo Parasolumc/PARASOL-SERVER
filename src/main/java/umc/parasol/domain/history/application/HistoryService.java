@@ -32,10 +32,10 @@ public class HistoryService {
 
     // 손님이 우산 결제 진행
     @Transactional
-    public ApiResponse createHistory(@CurrentUser UserPrincipal user, Long shopId) {
+    public ApiResponse rental(@CurrentUser UserPrincipal user, Long shopId) {
         Shop targetShop = findShopById(shopId);
         Member member = findMemberById(user.getId());
-        History history = createHistory(targetShop, member);
+        History history = rental(targetShop, member);
         historyRepository.save(history);
 
         HistoryRes record = makeHistoryRes(member, history, null);
@@ -44,7 +44,7 @@ public class HistoryService {
 
     // 손님이 우산 반납 진행
     @Transactional
-    public ApiResponse giveBack(@CurrentUser UserPrincipal user, Long shopId) {
+    public ApiResponse returnUmbrella(@CurrentUser UserPrincipal user, Long shopId) {
         Member member = findMemberById(user.getId());
 
         List<History> remainHistoryList = historyRepository.findAllByMember(member)
@@ -63,14 +63,7 @@ public class HistoryService {
 
         targetUmbrella.updateAvailable(true);
 
-        // 빌렸던 지점에 반납 가능하다면 일단 임시로 EndShop으로 등록
-        if (!umbrellaService.isFull(originShop))
-            targetHistory.updateEndShop(originShop);
-
         if (originShop != targetShop) { // 빌렸던 Shop과 다르다면
-            if (umbrellaService.isFull(targetShop))
-                throw new IllegalStateException("더 이상 우산을 채울 수 없습니다.");
-
             targetUmbrella.updateShop(targetShop);
             targetHistory.updateEndShop(targetShop);
         }
@@ -118,7 +111,7 @@ public class HistoryService {
                 .build();
     }
 
-    private History createHistory(Shop targetShop, Member member) {
+    private History rental(Shop targetShop, Member member) {
         return History.builder()
                 .cost(0L)
                 .process(Process.USE)
