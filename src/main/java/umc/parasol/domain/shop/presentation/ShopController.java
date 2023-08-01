@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import umc.parasol.domain.image.application.ImageService;
 import umc.parasol.domain.shop.application.ShopSearchService;
 import umc.parasol.domain.shop.application.ShopService;
+import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.dto.*;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
@@ -88,12 +89,27 @@ public class ShopController {
     @GetMapping(value = "/owner")
     public ResponseEntity<?> getOwnerShop(@CurrentUser UserPrincipal userPrincipal){
         try {
-            ShopRes shopListRes = shopService.getShopById(userPrincipal);
+            ShopRes shopRes = shopService.getShopById(userPrincipal);
             ApiResponse apiResponse = ApiResponse.builder()
                     .check(true)
-                    .information(shopListRes)
+                    .information(shopRes)
                     .build();
             return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 매장 정보 수정
+    @PutMapping(value = "/{id}/info")
+    public ResponseEntity<?> changeShopInfo(@PathVariable Long shopId, @CurrentUser UserPrincipal userPrincipal, @RequestBody UpdateInfoReq updateInfoReq){
+        try {
+                ShopRes updatedShop = shopService.updateInfo(userPrincipal, shopId, updateInfoReq);
+                ApiResponse apiResponse = ApiResponse.builder()
+                        .check(true)
+                        .information(updatedShop)
+                        .build();
+                return ResponseEntity.ok(apiResponse);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

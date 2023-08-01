@@ -7,12 +7,10 @@ import umc.parasol.domain.image.domain.Image;
 import umc.parasol.domain.image.domain.repository.ImageRepository;
 import umc.parasol.domain.image.dto.ImageRes;
 import umc.parasol.domain.member.domain.Member;
-import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.*;
-import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
 
 import java.util.List;
@@ -132,4 +130,34 @@ public class ShopService {
 
         return createShopRes(shop, imageResList);
     }
+
+    /**
+     * 매장 정보 수정
+     * @param userPrincipal api 호출하는 사용자 객체
+     * @param shopId 매장 ID
+     * @param updateInfoReq update할 정보 객체
+     */
+    public ShopRes updateInfo(UserPrincipal userPrincipal, Long shopId, UpdateInfoReq updateInfoReq) {
+
+        Member member = findValidMember(userPrincipal.getId());
+
+        Shop shop = findValidShopForOwner(member);
+
+        shop.updateDescription(updateInfoReq.getDesc());
+        shop.updateOpenTime(updateInfoReq.getOpenTime());
+        shop.updateCloseTime(updateInfoReq.getCloseTime());
+
+        Shop updatedShop = shopRepository.save(shop);
+
+
+        List<Image> imageList = imageRepository.findAllByShop(updatedShop);
+        List<ImageRes> imageResList = imageList.stream()
+                .map(this::createImageRes)
+                .toList();
+
+        return createShopRes(updatedShop, imageResList);
+
+
+    }
+
 }
