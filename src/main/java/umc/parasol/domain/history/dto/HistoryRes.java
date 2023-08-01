@@ -1,4 +1,4 @@
-package umc.parasol.domain.history.domain.dto;
+package umc.parasol.domain.history.dto;
 
 import lombok.Builder;
 import lombok.Data;
