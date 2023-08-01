@@ -47,7 +47,7 @@ public class HistoryService {
     public ApiResponse returnUmbrella(@CurrentUser UserPrincipal user, Long shopId) {
         Member member = findMemberById(user.getId());
 
-        List<History> remainHistoryList = historyRepository.findAllByMember(member)
+        List<History> remainHistoryList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member)
                 .stream()
                 .filter(history -> history.getProcess() != Process.CLEAR).toList();
 
@@ -75,7 +75,7 @@ public class HistoryService {
     // 손님의 대여 기록들 조회
     public ApiResponse historyList(@CurrentUser UserPrincipal user) {
         Member member = findMemberById(user.getId());
-        List<History> historyList = historyRepository.findAllByMember(member);
+        List<History> historyList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member);
         List<HistoryRes> historyResList = new ArrayList<>();
         for (History history : historyList) {
             historyResList.add(makeHistoryRes(member, history, null));

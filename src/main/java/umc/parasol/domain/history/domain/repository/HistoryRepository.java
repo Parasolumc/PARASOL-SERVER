@@ -7,5 +7,5 @@ import umc.parasol.domain.member.domain.Member;
 import java.util.List;
 
 public interface HistoryRepository extends JpaRepository<History, Long> {
-    List<History> findAllByMember(Member member);
+    List<History> findAllByMemberOrderByCreatedAtDesc(Member member);
 }
