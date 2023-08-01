@@ -32,6 +32,10 @@ public class UmbrellaService {
 
         Member owner = getMember(user);
         Shop targetShop = owner.getShop();
+
+        if (!getShopUmbrellaList(targetShop).isEmpty())
+            throw new IllegalStateException("이미 등록되어 있습니다.");
+
         IntStream.range(0, count)
                 .mapToObj(i -> Umbrella.createUmbrella(targetShop))
                 .forEach(umbrellaRepository::save);
