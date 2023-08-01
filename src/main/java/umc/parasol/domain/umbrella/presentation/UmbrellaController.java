@@ -15,11 +15,11 @@ public class UmbrellaController {
 
     private final UmbrellaService umbrellaService;
 
-    @PostMapping("/init")
+    @PostMapping("/add")
     // 매장에 우산 초기 등록
-    public ResponseEntity<?> umbrellaSetting(@CurrentUser UserPrincipal user, @RequestBody UmbrellaAddReq req) {
+    public ResponseEntity<?> add(@CurrentUser UserPrincipal user, @RequestBody UmbrellaAddReq req) {
         try {
-            return ResponseEntity.ok(umbrellaService.init(user, req.getCount()));
+            return ResponseEntity.ok(umbrellaService.addUmbrella(user, req.getCount()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
