@@ -31,6 +31,11 @@ public class MemberService {
         validateOriginPassword(oldPw, user.getPassword());
 
         String newPw = updatePwReq.getNewPw();
+        String reNewPw = updatePwReq.getReNewPw();
+
+        if (!newPw.equals(reNewPw))
+            throw new IllegalStateException("새로 입력한 비밀번호가 서로 일치하지 않습니다.");
+
         Member findMember = memberRepository.findById(user.getId()).orElseThrow(
                 () -> new IllegalStateException("해당 member가 없습니다.")
         );
