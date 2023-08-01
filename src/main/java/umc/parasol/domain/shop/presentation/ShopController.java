@@ -102,9 +102,9 @@ public class ShopController {
 
     // 매장 정보 수정
     @PutMapping(value = "/{id}/info")
-    public ResponseEntity<?> changeShopInfo(@PathVariable Long shopId, @CurrentUser UserPrincipal userPrincipal, @RequestBody UpdateInfoReq updateInfoReq){
+    public ResponseEntity<?> changeShopInfo(@PathVariable Long id, @CurrentUser UserPrincipal userPrincipal, @RequestBody UpdateInfoReq updateInfoReq){
         try {
-                ShopRes updatedShop = shopService.updateInfo(userPrincipal, shopId, updateInfoReq);
+                ShopRes updatedShop = shopService.updateInfo(userPrincipal, id, updateInfoReq);
                 ApiResponse apiResponse = ApiResponse.builder()
                         .check(true)
                         .information(updatedShop)
