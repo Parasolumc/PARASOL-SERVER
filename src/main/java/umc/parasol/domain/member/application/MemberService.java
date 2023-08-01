@@ -31,6 +31,10 @@ public class MemberService {
         validateOriginPassword(oldPw, user.getPassword());
 
         String newPw = updatePwReq.getNewPw();
+        
+        if (oldPw.equals(newPw))
+            throw new IllegalStateException("변경하려는 비밀번호가 같습니다.");
+
         String reNewPw = updatePwReq.getReNewPw();
 
         if (!newPw.equals(reNewPw))
