@@ -54,7 +54,7 @@ public class HistoryService {
         if (remainHistoryList.isEmpty())
             throw new IllegalStateException("처리되지 않은 우산 내역이 없습니다.");
 
-        History targetHistory = remainHistoryList.get(0);
+        History targetHistory = remainHistoryList.get(remainHistoryList.size() - 1);
         Umbrella targetUmbrella = targetHistory.getUmbrella();
         targetHistory.updateProcess(Process.CLEAR); // History CLEAR 상태로 변경
 
