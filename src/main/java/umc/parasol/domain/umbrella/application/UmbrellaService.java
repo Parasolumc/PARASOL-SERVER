@@ -64,7 +64,7 @@ public class UmbrellaService {
         Umbrella newUmbrella = Umbrella.createUmbrella(targetShop);
         umbrellaRepository.save(newUmbrella);
 
-        return new ApiResponse(true, "구입 완료");
+        return new ApiResponse(true, "판매 완료");
     }
 
     /*
