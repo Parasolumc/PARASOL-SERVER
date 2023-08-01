@@ -16,7 +16,7 @@ public class UmbrellaController {
     private final UmbrellaService umbrellaService;
 
     @PostMapping("/add")
-    // 매장에 우산 초기 등록
+    // 매장에 우산 등록
     public ResponseEntity<?> add(@CurrentUser UserPrincipal user, @RequestBody UmbrellaAddReq req) {
         try {
             return ResponseEntity.ok(umbrellaService.addUmbrella(user, req.getCount()));
@@ -25,13 +25,4 @@ public class UmbrellaController {
         }
     }
 
-    @PostMapping("/sell/{id}")
-    // 손님이 우산 판매
-    public ResponseEntity<?> buyUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(umbrellaService.buyUmbrella(user, id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 }

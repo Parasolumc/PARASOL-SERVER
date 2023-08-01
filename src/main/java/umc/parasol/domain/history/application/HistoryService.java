@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.history.domain.History;
 import umc.parasol.domain.history.domain.Process;
-import umc.parasol.domain.history.domain.dto.HistoryRes;
+import umc.parasol.domain.history.dto.HistoryRes;
 import umc.parasol.domain.history.domain.repository.HistoryRepository;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
