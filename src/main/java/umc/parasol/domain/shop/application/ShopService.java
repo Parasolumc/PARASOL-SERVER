@@ -116,31 +116,20 @@ public class ShopService {
     }
 
     /**
-     * 매장 ID로 매장 조회
-     *
+     * 본인 매장 조회
      * @param userPrincipal api 호출하는 사용자 객체
-     * @param shopId            매장 ID
      */
-    public ShopRes getShopById(UserPrincipal userPrincipal, Long shopId) {
-        Optional<Member> member = memberRepository.findById(userPrincipal.getId());
-        DefaultAssert.isTrue(member.isPresent(), "유저가 올바르지 않습니다.");
-        Member findMember = member.get();
+    public ShopRes getShopById(UserPrincipal userPrincipal) {
 
-        // 사장님인지 체크
-        DefaultAssert.isTrue(findMember.getRole() == Role.OWNER, "사장님만 매장 정보를 조회할 수 있습니다.");
+        Member member = findValidMember(userPrincipal.getId());
 
-        Optional<Shop> shop = Optional.ofNullable(findMember.getShop());
-        DefaultAssert.isTrue(shop.isPresent(), "연결된 매장이 없습니다.");
-        Shop findShop = shop.get();
+        Shop shop = findValidShopForOwner(member);
 
-        // 연결된 정보와 매장 정보가 일치하는지 확인
-        DefaultAssert.isTrue(findShop.getId().equals(shopId), "본인의 매장 정보만 조회 가능합니다.");
-
-        List<Image> imageList = imageRepository.findAllByShop(findShop);
+        List<Image> imageList = imageRepository.findAllByShop(shop);
         List<ImageRes> imageResList = imageList.stream()
                 .map(this::createImageRes)
                 .toList();
 
-        return createShopRes(findShop, imageResList);
+        return createShopRes(shop, imageResList);
     }
 }

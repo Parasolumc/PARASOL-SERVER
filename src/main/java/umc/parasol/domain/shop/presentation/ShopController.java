@@ -85,10 +85,10 @@ public class ShopController {
     }
 
     // 사장님 본인 매장 조회
-    @GetMapping(value = "/owner/{id}")
-    public ResponseEntity<?> getOwnerShop(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long id){
+    @GetMapping(value = "/owner")
+    public ResponseEntity<?> getOwnerShop(@CurrentUser UserPrincipal userPrincipal){
         try {
-            ShopRes shopListRes = shopService.getShopById(userPrincipal, id);
+            ShopRes shopListRes = shopService.getShopById(userPrincipal);
             ApiResponse apiResponse = ApiResponse.builder()
                     .check(true)
                     .information(shopListRes)
