@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
+import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
 import umc.parasol.global.config.security.token.UserPrincipal;
@@ -21,6 +22,7 @@ public class UmbrellaService {
 
     private final UmbrellaRepository umbrellaRepository;
     private final MemberRepository memberRepository;
+    private final ShopRepository shopRepository;
 
     @Transactional
     // 초기 세팅 (처음에 Shop 등록했을 시 몇 개 우산 가지고 있는지 설정)
@@ -28,7 +30,7 @@ public class UmbrellaService {
         if (count > Umbrella.MAX || count <= 0)
             throw new IllegalStateException("우산 갯수가 올바르지 않습니다.");
 
-        Member owner = getShopOwner(user);
+        Member owner = getMember(user);
         Shop targetShop = owner.getShop();
         IntStream.range(0, count)
                 .mapToObj(i -> Umbrella.createUmbrella(targetShop))
@@ -53,10 +55,10 @@ public class UmbrellaService {
     */
 
     @Transactional
-    // 손님에게 중고 우산을 구매함
-    public ApiResponse buyUmbrella(UserPrincipal user) {
-        Member owner = getShopOwner(user);
-        Shop targetShop = owner.getShop();
+    // 손님이 우산을 판매함
+    public ApiResponse buyUmbrella(UserPrincipal user, Long shopId) {
+        Member owner = getMember(user);
+        Shop targetShop = getShop(shopId);
         if (isFull(targetShop))
             throw new IllegalStateException("더 이상 우산을 채울 수 없습니다.");
         Umbrella newUmbrella = Umbrella.createUmbrella(targetShop);
@@ -92,9 +94,14 @@ public class UmbrellaService {
     }
 
     // 현재 로그인 한 멤버를 가져오는 작업
-    private Member getShopOwner(UserPrincipal user) {
+    private Member getMember(UserPrincipal user) {
         return memberRepository.findById(user.getId())
                 .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
+    }
+
+    private Shop getShop(Long id) {
+        return shopRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("해당 shop이 없습니다."));
     }
 
     @Transactional

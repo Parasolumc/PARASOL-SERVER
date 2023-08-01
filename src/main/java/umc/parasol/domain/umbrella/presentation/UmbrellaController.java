@@ -2,10 +2,7 @@ package umc.parasol.domain.umbrella.presentation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import umc.parasol.domain.umbrella.application.UmbrellaService;
 import umc.parasol.domain.umbrella.dto.UmbrellaAddReq;
 import umc.parasol.global.config.security.token.CurrentUser;
@@ -28,11 +25,11 @@ public class UmbrellaController {
         }
     }
 
-    @PostMapping("/buy")
-    // 손님으로부터 우산 구입
-    public ResponseEntity<?> buyUmbrella(@CurrentUser UserPrincipal user) {
+    @PostMapping("/sell/{id}")
+    // 손님이 우산 판매
+    public ResponseEntity<?> buyUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
         try {
-            return ResponseEntity.ok(umbrellaService.buyUmbrella(user));
+            return ResponseEntity.ok(umbrellaService.buyUmbrella(user, id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
