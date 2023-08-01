@@ -1,6 +1,7 @@
 package umc.parasol.domain.shop.application;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.type.descriptor.java.ShortPrimitiveArrayJavaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.image.domain.Image;
@@ -12,9 +13,12 @@ import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.*;
+import umc.parasol.domain.umbrella.domain.Umbrella;
+import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
 import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +32,8 @@ public class ShopService {
     private final ShopRepository shopRepository;
 
     private final ImageRepository imageRepository;
+
+    private final UmbrellaRepository umbrellaRepository;
 
     /**
      * 매장 리스트 조회
@@ -61,6 +67,24 @@ public class ShopService {
         return createShopRes(shop, imageResList);
     }
 
+    /**
+     * 본인 매장 조회
+     * @param userPrincipal api 호출하는 사용자 객체
+     */
+    public ShopRes getShopById(UserPrincipal userPrincipal) {
+
+        Member member = findValidMember(userPrincipal.getId());
+
+        Shop shop = findValidShopForOwner(member);
+
+        List<Image> imageList = imageRepository.findAllByShop(shop);
+        List<ImageRes> imageResList = imageList.stream()
+                .map(this::createImageRes)
+                .toList();
+
+        return createShopRes(shop, imageResList);
+    }
+
     // 유효한 사용자인지 체크하는 메서드
     private Member findValidMember(Long memberId) {
         return memberRepository.findById(memberId)
@@ -79,6 +103,18 @@ public class ShopService {
                 .orElseThrow(() -> new IllegalArgumentException("연결된 매장이 없습니다."));
     }
 
+    // 매장에 있는 모든 우산 리스트를 가져오는 메서드
+    public List<Umbrella> getUmbrella(Shop shop) {
+        return Optional.ofNullable(umbrellaRepository.findAllByShop(shop))
+                .orElseThrow(() -> new IllegalArgumentException("우산이 없습니다."));
+    }
+
+    // 매장에 있는 대여 가능한 우산 리스트를 가져오는 메서드
+    public List<Umbrella> getAvailableUmbrella(Shop shop) {
+        return Optional.ofNullable(umbrellaRepository.findAllByShopAndAvailableIsTrue(shop))
+                .orElseThrow(() -> new IllegalArgumentException("대여 가능한 우산이 없습니다."));
+    }
+
     // ShopList 응답을 생성해주는 메서드
     private ShopListRes createShopListRes(Shop shop) {
         return ShopListRes.builder()
@@ -89,6 +125,8 @@ public class ShopService {
                 .roadNameAddress(shop.getRoadNameAddress())
                 .openTime(shop.getOpenTime())
                 .closeTime(shop.getCloseTime())
+                .availableUmbrella(getAvailableUmbrella(shop).size())
+                .unavailableUmbrella(getUmbrella(shop).size() - getAvailableUmbrella(shop).size())
                 .build();
     }
 
@@ -103,6 +141,7 @@ public class ShopService {
                 .roadNameAddress(shop.getRoadNameAddress())
                 .openTime(shop.getOpenTime())
                 .closeTime(shop.getCloseTime())
+                .availableUmbrella(getAvailableUmbrella(shop).size())
                 .image(imageResList)
                 .build();
     }
@@ -115,21 +154,4 @@ public class ShopService {
                 .build();
     }
 
-    /**
-     * 본인 매장 조회
-     * @param userPrincipal api 호출하는 사용자 객체
-     */
-    public ShopRes getShopById(UserPrincipal userPrincipal) {
-
-        Member member = findValidMember(userPrincipal.getId());
-
-        Shop shop = findValidShopForOwner(member);
-
-        List<Image> imageList = imageRepository.findAllByShop(shop);
-        List<ImageRes> imageResList = imageList.stream()
-                .map(this::createImageRes)
-                .toList();
-
-        return createShopRes(shop, imageResList);
-    }
 }

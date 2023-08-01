@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface UmbrellaRepository extends JpaRepository<Umbrella, Long> {
     List<Umbrella> findAllByShop(Shop shop);
+
+    List<Umbrella> findAllByShopAndAvailableIsTrue(Shop shop);
 }
