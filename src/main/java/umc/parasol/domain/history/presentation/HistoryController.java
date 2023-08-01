@@ -42,4 +42,14 @@ public class HistoryController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // 손님의 현재 대여 현황
+    @GetMapping("/now")
+    public ResponseEntity<?> currentRental(@CurrentUser UserPrincipal user) {
+        try {
+            return ResponseEntity.ok(historyService.rentalStatus(user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
