@@ -59,8 +59,6 @@ public class UmbrellaService {
     public ApiResponse buyUmbrella(UserPrincipal user, Long shopId) {
         Member owner = getMember(user);
         Shop targetShop = getShop(shopId);
-        if (isFull(targetShop))
-            throw new IllegalStateException("더 이상 우산을 채울 수 없습니다.");
         Umbrella newUmbrella = Umbrella.createUmbrella(targetShop);
         umbrellaRepository.save(newUmbrella);
 
@@ -74,12 +72,6 @@ public class UmbrellaService {
 
     }
     */
-
-   // 한 매장 당 가질 수 있는 우산 갯수가 최대치를 초과했는지
-    public boolean isFull(Shop shop) {
-        List<Umbrella> umbrellaList = getShopUmbrellaList(shop);
-        return umbrellaList.size() == Umbrella.MAX;
-    }
 
     // 매장에 등록된 우산 중 남은 우산이 비어있는지
     private boolean isNoMoreFree(Shop shop) {
