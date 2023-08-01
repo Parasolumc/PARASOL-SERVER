@@ -26,12 +26,13 @@ public class UmbrellaService {
 
     @Transactional
     // 초기 세팅 (처음에 Shop 등록했을 시 몇 개 우산 가지고 있는지 설정)
-    public ApiResponse init(UserPrincipal user, int count) {
+    public ApiResponse addUmbrella(UserPrincipal user, int count) {
         if (count <= 0)
             throw new IllegalStateException("우산 갯수가 올바르지 않습니다.");
 
         Member owner = getMember(user);
         Shop targetShop = owner.getShop();
+
         IntStream.range(0, count)
                 .mapToObj(i -> Umbrella.createUmbrella(targetShop))
                 .forEach(umbrellaRepository::save);
