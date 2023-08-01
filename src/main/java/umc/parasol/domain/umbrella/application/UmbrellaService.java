@@ -27,7 +27,7 @@ public class UmbrellaService {
     @Transactional
     // 초기 세팅 (처음에 Shop 등록했을 시 몇 개 우산 가지고 있는지 설정)
     public ApiResponse init(UserPrincipal user, int count) {
-        if (count > Umbrella.MAX || count <= 0)
+        if (count <= 0)
             throw new IllegalStateException("우산 갯수가 올바르지 않습니다.");
 
         Member owner = getMember(user);
