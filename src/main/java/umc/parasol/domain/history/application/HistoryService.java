@@ -32,10 +32,10 @@ public class HistoryService {
 
     // 손님이 우산 결제 진행
     @Transactional
-    public ApiResponse rental(@CurrentUser UserPrincipal user, Long shopId) {
+    public ApiResponse rentalUmbrella(@CurrentUser UserPrincipal user, Long shopId) {
         Shop targetShop = findShopById(shopId);
         Member member = findMemberById(user.getId());
-        History history = rental(targetShop, member);
+        History history = rentalUmbrella(targetShop, member);
         historyRepository.save(history);
 
         HistoryRes record = makeHistoryRes(member, history, null);
@@ -111,9 +111,9 @@ public class HistoryService {
                 .build();
     }
 
-    private History rental(Shop targetShop, Member member) {
+    private History rentalUmbrella(Shop targetShop, Member member) {
         return History.builder()
-                .cost(0L)
+                .cost(0)
                 .process(Process.USE)
                 .fromShop(targetShop)
                 .endShop(null)

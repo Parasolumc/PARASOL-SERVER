@@ -15,9 +15,9 @@ public class HistoryController {
 
     // 손님이 우산 대여
     @PostMapping("/rental/{id}")
-    public ResponseEntity<?> rental(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+    public ResponseEntity<?> rentalUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
         try {
-            return ResponseEntity.ok(historyService.rental(user, id));
+            return ResponseEntity.ok(historyService.rentalUmbrella(user, id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
