@@ -46,7 +46,7 @@ public class History extends BaseEntity {
     private Umbrella umbrella;
 
     @NotNull(message = "가격이 설정되어 있어야 합니다.")
-    private Long cost;
+    private int cost;
     
     @Enumerated(EnumType.STRING)
     @NotNull(message = "절차가 설정되어 있어야 합니다.")
