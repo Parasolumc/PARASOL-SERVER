@@ -47,7 +47,7 @@ public class HistoryService {
     public ApiResponse returnUmbrella(@CurrentUser UserPrincipal user, Long shopId) {
         Member member = findMemberById(user.getId());
 
-        List<History> remainHistoryList = historyRepository.findAllByMember(member)
+        List<History> remainHistoryList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member)
                 .stream()
                 .filter(history -> history.getProcess() != Process.CLEAR).toList();
 
@@ -75,7 +75,7 @@ public class HistoryService {
     // 손님의 대여 기록들 조회
     public ApiResponse historyList(@CurrentUser UserPrincipal user) {
         Member member = findMemberById(user.getId());
-        List<History> historyList = historyRepository.findAllByMember(member);
+        List<History> historyList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member);
         List<HistoryRes> historyResList = new ArrayList<>();
         for (History history : historyList) {
             historyResList.add(makeHistoryRes(member, history, null));
@@ -83,6 +83,31 @@ public class HistoryService {
 
         return new ApiResponse(true, historyResList);
     }
+
+
+    // 손님의 현재 대여 현황 조회
+    public ApiResponse rentalStatus(@CurrentUser UserPrincipal user){
+        Member member = findMemberById(user.getId());
+        List<History> historyList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member);
+
+        //대여 내역이 존재하지 않을 때
+        if(historyList.size() == 0) {
+            return new ApiResponse(true, null);
+        }
+
+        History recentRental = historyList.get(0); //제일 최근 빌린 내역
+        Process rentalProcess = recentRental.getProcess(); //해당 내역의 상태
+
+        //현재 대여중이 아닌 경우: null
+        if(rentalProcess == Process.CLEAR) {
+            return new ApiResponse(true, null);
+        } //대여중인 경우
+        else {
+            HistoryRes recentHistory = makeHistoryRes(member, recentRental, null);
+            return new ApiResponse(true, recentHistory);
+        }
+    }
+
 
     private Shop findShopById(Long shopId) {
         return shopRepository.findById(shopId).orElseThrow(
