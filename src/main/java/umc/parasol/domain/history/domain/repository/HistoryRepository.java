@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface HistoryRepository extends JpaRepository<History, Long> {
     List<History> findAllByMemberOrderByCreatedAtDesc(Member member);
+    List<History> findAllByMember(Member member);
 }
