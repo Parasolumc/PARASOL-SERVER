@@ -58,6 +58,7 @@ public class AuthSignService {
         return member.getId();
     }
 
+    @Transactional
     // 회원가입 (사장님-owner)
     public Long signUpOwner(SignUpOwnerReq signUpOwnerReq) {
         DefaultAssert.isTrue(!memberRepository.existsByEmail(signUpOwnerReq.getEmail()), "해당 이메일이 존재합니다.");
