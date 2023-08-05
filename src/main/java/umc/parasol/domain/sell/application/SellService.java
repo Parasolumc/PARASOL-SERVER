@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.member.domain.Member;
+import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.sell.domain.Sell;
 import umc.parasol.domain.sell.domain.repository.SellRepository;
@@ -12,7 +13,9 @@ import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
+import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,7 @@ public class SellService {
     @Transactional
     public SellResultRes sellUmbrella(UserPrincipal userPrincipal, Long shopId) {
 
-        Member findMember = getMember(userPrincipal);
+        Member findMember = getCustomer(userPrincipal);
 
         Shop targetShop = getShop(shopId);
 
@@ -54,10 +57,18 @@ public class SellService {
 
     }
 
-    // 현재 로그인 한 멤버를 가져오는 작업
-    private Member getMember(UserPrincipal user) {
-        return memberRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
+    // 현재 로그인 한 멤버를 가져오는 메서드, 사장님이면 예외 처리
+    private Member getCustomer(UserPrincipal user) {
+
+        Optional<Member> member = memberRepository.findById(user.getId());
+        DefaultAssert.isTrue(member.isPresent(), "사용자가 올바르지 않습니다.");
+        Member findMember = member.get();
+
+        if (findMember.getRole() == Role.OWNER) {
+            throw new IllegalStateException("일반 사용자만 판매가 가능합니다.");
+        }
+
+        return findMember;
     }
 
     // 매장을 가져오는 메서드
