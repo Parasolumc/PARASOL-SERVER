@@ -78,7 +78,7 @@ public class HistoryService {
         List<History> historyList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member);
         List<HistoryRes> historyResList = new ArrayList<>();
         for (History history : historyList) {
-            historyResList.add(makeHistoryRes(member, history, null));
+            historyResList.add(makeHistoryRes(member, history, history.getEndShop()));
         }
 
         return new ApiResponse(true, historyResList);
