@@ -65,9 +65,9 @@ public class HistoryService {
 
         if (originShop != targetShop) { // 빌렸던 Shop과 다르다면
             targetUmbrella.updateShop(targetShop);
-            targetHistory.updateEndShop(targetShop);
         }
         targetHistory.updateClearedAt(LocalDateTime.now());
+        targetHistory.updateEndShop(targetShop);
         HistoryRes record = makeHistoryRes(member, targetHistory, targetShop);
         return new ApiResponse(true, record);
     }
