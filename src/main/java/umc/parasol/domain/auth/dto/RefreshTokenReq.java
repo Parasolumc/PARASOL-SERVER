@@ -2,8 +2,10 @@ package umc.parasol.domain.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
+@Getter
 public class RefreshTokenReq {
 
     @NotBlank(message = "Refersh Token을 입력해야 합니다.")
