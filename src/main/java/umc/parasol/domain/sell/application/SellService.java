@@ -13,6 +13,7 @@ import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
+import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import java.util.Optional;
 
@@ -60,6 +61,7 @@ public class SellService {
     private Member getCustomer(UserPrincipal user) {
 
         Optional<Member> member = memberRepository.findById(user.getId());
+        DefaultAssert.isTrue(member.isPresent(), "사용자가 올바르지 않습니다.");
         Member findMember = member.get();
 
         if (findMember.getRole() == Role.OWNER) {
