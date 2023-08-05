@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.parasol.domain.umbrella.application.UmbrellaService;
+import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.dto.UmbrellaAddReq;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
@@ -20,6 +21,16 @@ public class UmbrellaController {
     public ResponseEntity<?> add(@CurrentUser UserPrincipal user, @RequestBody UmbrellaAddReq req) {
         try {
             return ResponseEntity.ok(umbrellaService.addUmbrella(user, req.getCount()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping ("/sell")
+    //판매한 우산 찾기
+    public ResponseEntity<?> sellHistory(@CurrentUser UserPrincipal user){
+        try {
+            return ResponseEntity.ok(umbrellaService.sellList(user));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

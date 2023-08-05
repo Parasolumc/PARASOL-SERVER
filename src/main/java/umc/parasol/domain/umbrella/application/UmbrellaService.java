@@ -3,15 +3,24 @@ package umc.parasol.domain.umbrella.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.parasol.domain.history.domain.History;
+import umc.parasol.domain.history.dto.HistoryRes;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.sell.domain.Sell;
+import umc.parasol.domain.sell.domain.repository.SellRepository;
+import umc.parasol.domain.sell.dto.SellHistoryRes;
+import umc.parasol.domain.sell.dto.SellResultRes;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
+import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -23,6 +32,7 @@ public class UmbrellaService {
     private final UmbrellaRepository umbrellaRepository;
     private final MemberRepository memberRepository;
     private final ShopRepository shopRepository;
+    private final SellRepository sellRepository;
 
     @Transactional
     // 우산 개수 추가
@@ -79,4 +89,34 @@ public class UmbrellaService {
 
         return umbrella;
     }
+
+
+    //손님이 여태까지 판매한 우산 조회
+    public ApiResponse sellList(@CurrentUser UserPrincipal user){
+        Member member = getMember(user);
+        List<Sell> sellList = sellRepository.findByMemberId(member.getId());
+        List<SellHistoryRes> historyResList = new ArrayList<>();
+
+        if(sellList.isEmpty()){ //판매 내역이 존재하지 않음
+            return new ApiResponse(true, null);
+        }
+        else {
+            for (Sell sell : sellList) {
+                historyResList.add(makeSellHistoryRes(sell));
+            }
+            return new ApiResponse(true, historyResList);
+        }
+    }
+
+
+    private SellHistoryRes makeSellHistoryRes(Sell sell) {
+        return SellHistoryRes.builder()
+                .sellShop(sell.getShop().getName())
+                .createdAt(sell.getCreatedAt())
+                .umbrellaCount(1L)
+                .build();
+    }
+
 }
+
+
