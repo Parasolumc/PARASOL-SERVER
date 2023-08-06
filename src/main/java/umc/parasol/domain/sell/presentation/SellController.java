@@ -2,10 +2,7 @@ package umc.parasol.domain.sell.presentation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import umc.parasol.domain.sell.application.SellService;
 import umc.parasol.domain.sell.dto.SellResultRes;
 import umc.parasol.global.config.security.token.CurrentUser;
@@ -33,5 +30,15 @@ public class SellController {
                 .build();
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping
+    //판매한 우산 찾기
+    public ResponseEntity<?> sellHistory(@CurrentUser UserPrincipal user){
+        try {
+            return ResponseEntity.ok(sellService.sellList(user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
