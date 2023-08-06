@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class SellHistoryRes {
     private String sellShop; // 판매한 매장 이름
-    private LocalDateTime createdAt; // 판매 시각
-    private Long umbrellaCount;
+    private String createdAt; // 판매 날짜
+    private Long umbrellaCount; //우산 개수
 
     @Builder
-    public SellHistoryRes(String sellShop, LocalDateTime createdAt,
+    public SellHistoryRes(String sellShop, String createdAt,
                           Long umbrellaCount) {
         this.sellShop = sellShop;
         this.createdAt = createdAt;

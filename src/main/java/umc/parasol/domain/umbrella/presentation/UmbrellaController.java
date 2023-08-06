@@ -26,14 +26,6 @@ public class UmbrellaController {
         }
     }
 
-    @GetMapping ("/sell")
-    //판매한 우산 찾기
-    public ResponseEntity<?> sellHistory(@CurrentUser UserPrincipal user){
-        try {
-            return ResponseEntity.ok(umbrellaService.sellList(user));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+
 
 }

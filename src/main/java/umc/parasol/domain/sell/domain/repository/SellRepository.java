@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface SellRepository extends JpaRepository<Sell, Long> {
     List<Sell> findByMemberId(Long memberId);
+
+    List<Sell> findAllByMemberIdOrderByCreatedAtDesc(Long memberId); //내림차순(최근-과거)
 }
