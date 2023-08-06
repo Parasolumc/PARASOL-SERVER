@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.parasol.domain.umbrella.application.UmbrellaService;
-import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.dto.UmbrellaAddReq;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;

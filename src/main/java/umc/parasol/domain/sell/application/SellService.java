@@ -19,7 +19,6 @@ import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -75,23 +74,22 @@ public class SellService {
         if(sellList.isEmpty()){ //판매 내역이 존재하지 않음
             return new ApiResponse(true, null);
         }
-        else {
-            for (Sell sell : sellList) {
-                historyResList.add(makeSellHistoryRes(sell, 1L));
-            }
-            Map<SellHistoryRes, Long> historyMap = historyResList.stream().collect(
-                    Collectors.toMap(Function.identity(), value -> 1L, Long::sum));
-
-            for (SellHistoryRes res : historyMap.keySet()) {
-                resultList.add(makeSellHistoryRes(res.getSellShop(), res.getCreatedAt(), historyMap.get(res)));
-            }
-
-            //시간 순 정렬
-            List<SellHistoryRes> sortedResultList = resultList.stream()
-                    .sorted(Comparator.comparing(SellHistoryRes::getCreatedAt)).collect(Collectors.toList());
-
-            return new ApiResponse(true, sortedResultList);
+        for (Sell sell : sellList) {
+            historyResList.add(makeSellHistoryRes(sell, 1L));
         }
+        Map<SellHistoryRes, Long> historyMap = historyResList.stream().collect(
+                Collectors.toMap(Function.identity(), value -> 1L, Long::sum));
+
+        for (SellHistoryRes res : historyMap.keySet()) {
+            resultList.add(makeSellHistoryRes(res.getSellShop(), res.getCreatedAt(), historyMap.get(res)));
+        }
+
+        //시간 순 정렬
+        List<SellHistoryRes> sortedResultList = resultList.stream()
+                .sorted(Comparator.comparing(SellHistoryRes::getCreatedAt)).collect(Collectors.toList());
+
+        return new ApiResponse(true, sortedResultList);
+
     }
 
 
