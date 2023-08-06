@@ -86,7 +86,7 @@ public class SellService {
 
         //시간 순 정렬
         List<SellHistoryRes> sortedResultList = resultList.stream()
-                .sorted(Comparator.comparing(SellHistoryRes::getCreatedAt)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(SellHistoryRes::getCreatedAt)).toList();
 
         return new ApiResponse(true, sortedResultList);
 
