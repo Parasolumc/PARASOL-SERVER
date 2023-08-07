@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import umc.parasol.domain.common.BaseEntity;
 import umc.parasol.domain.member.domain.Member;
+import umc.parasol.domain.shop.domain.Shop;
 
 import java.time.LocalDateTime;
 
@@ -35,6 +36,10 @@ public class Notification extends BaseEntity {
     @NotNull(message = "수신자가 설정되어 있어야 합니다.")
     private Member recipient; // 수신 대상
 
+    @ManyToOne
+    @JoinColumn(name = "shop_id")
+    @NotNull(message = "매장이 설정되어 있어야 합니다.")
+    private Shop shop; // 연관된 Shop
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "알림 타입이 설정되어 있어야 합니다.")
@@ -51,6 +56,8 @@ public class Notification extends BaseEntity {
     public void updateRecipient(Member recipient) {
         this.recipient = recipient;
     }
+
+    public void updateShop(Shop shop) { this.shop = shop; }
 
     public void updateType(NotificationType type) {
         this.type = type;

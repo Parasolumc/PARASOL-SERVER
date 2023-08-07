@@ -17,5 +17,7 @@ public class NotificationRes {
 
     private Long recipientId; // 알림 수신 대상
 
+    private Long shopId; // 알림 내용과 연동된 Shop ID
+
     private NotificationType type; // 알림 타입
 }
