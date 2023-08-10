@@ -97,14 +97,16 @@ public class ShopService {
 
     // ShopList 응답을 생성해주는 메서드
     private ShopListRes createShopListRes(Shop shop) {
+        String openTime = shop.getOpenTime() != null ? shop.getOpenTime() : "";
+        String closeTime = shop.getCloseTime() != null ? shop.getCloseTime() : "";
         return ShopListRes.builder()
                 .id(shop.getId())
                 .shopName(shop.getName())
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .roadNameAddress(shop.getRoadNameAddress())
-                .openTime(shop.getOpenTime())
-                .closeTime(shop.getCloseTime())
+                .openTime(openTime)
+                .closeTime(closeTime)
                 .availableUmbrella(getAvailableUmbrella(shop).size())
                 .unavailableUmbrella(getUmbrella(shop).size() - getAvailableUmbrella(shop).size())
                 .build();
@@ -112,15 +114,18 @@ public class ShopService {
 
     // Shop 응답을 생성해주는 메서드
     private ShopRes createShopRes(Shop shop, List<ImageRes> imageResList) {
+        String desc = shop.getDescription() != null ? shop.getDescription() : "";
+        String openTime = shop.getOpenTime() != null ? shop.getOpenTime() : "";
+        String closeTime = shop.getCloseTime() != null ? shop.getCloseTime() : "";
         return ShopRes.builder()
                 .id(shop.getId())
                 .shopName(shop.getName())
-                .desc(shop.getDescription())
+                .desc(desc)
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .roadNameAddress(shop.getRoadNameAddress())
-                .openTime(shop.getOpenTime())
-                .closeTime(shop.getCloseTime())
+                .openTime(openTime)
+                .closeTime(closeTime)
                 .availableUmbrella(getAvailableUmbrella(shop).size())
                 .image(imageResList)
                 .build();
