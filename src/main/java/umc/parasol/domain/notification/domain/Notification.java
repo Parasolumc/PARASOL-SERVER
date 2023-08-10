@@ -45,21 +45,4 @@ public class Notification extends BaseEntity {
     @NotNull(message = "알림 타입이 설정되어 있어야 합니다.")
     private NotificationType type; // 알림 타입
 
-    public void updateContent(String content) {
-        this.content = content;
-    }
-
-    public void updateSentTime(LocalDateTime sentTime) {
-        this.sentTime = sentTime;
-    }
-
-    public void updateRecipient(Member recipient) {
-        this.recipient = recipient;
-    }
-
-    public void updateShop(Shop shop) { this.shop = shop; }
-
-    public void updateType(NotificationType type) {
-        this.type = type;
-    }
 }

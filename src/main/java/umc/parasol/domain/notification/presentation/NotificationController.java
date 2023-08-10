@@ -17,6 +17,7 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
+    // 알림 모두 조회
     @GetMapping
     public ResponseEntity<?> getAllNotifications(@CurrentUser UserPrincipal user) {
 
@@ -28,5 +29,11 @@ public class NotificationController {
                 .build();
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+    // 알림 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteNotification(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+        return ResponseEntity.ok(notificationService.deleteNotification(user, id));
     }
 }
