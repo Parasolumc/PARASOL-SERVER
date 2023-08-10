@@ -72,7 +72,7 @@ public class SellService {
         List<SellHistoryRes> resultList = new ArrayList<>(); //반환할 리스트(중복제거)
 
         if(sellList.isEmpty()){ //판매 내역이 존재하지 않음
-            return new ApiResponse(true, null);
+            return new ApiResponse(true, "");
         }
         for (Sell sell : sellList) {
             historyResList.add(makeSellHistoryRes(sell, 1L));

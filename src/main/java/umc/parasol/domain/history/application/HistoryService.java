@@ -92,7 +92,7 @@ public class HistoryService {
 
         //대여 내역이 존재하지 않을 때
         if(historyList.size() == 0) {
-            return new ApiResponse(true, null);
+            return new ApiResponse(true, "");
         }
 
         History recentRental = historyList.get(0); //제일 최근 빌린 내역
@@ -100,7 +100,7 @@ public class HistoryService {
 
         //현재 대여중이 아닌 경우: null
         if(rentalProcess == Process.CLEAR) {
-            return new ApiResponse(true, null);
+            return new ApiResponse(true, "");
         } //대여중인 경우
         else {
             HistoryRes recentHistory = makeHistoryRes(member, recentRental, null);
