@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import umc.parasol.domain.common.Status;
 import umc.parasol.domain.image.domain.Image;
 import umc.parasol.domain.image.domain.repository.ImageRepository;
 import umc.parasol.domain.image.dto.ImageRes;
@@ -26,25 +27,17 @@ public class ImageService {
     private final MemberRepository memberRepository;
     private final S3Uploader s3Uploader;
 
-    public ApiResponse upload(Long shopId, MultipartFile file, UserPrincipal user) throws Exception {
-        validShopAndIsOwner(shopId, user);
+    public ApiResponse upload(MultipartFile file, UserPrincipal user) throws Exception {
         String storedFileUrl = s3Uploader.outerUpload(file, "shop", user);
-        Image storedImage = createImageEntity(storedFileUrl, shopId);
+        Member owner = memberRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
+        Shop targetShop = owner.getShop();
+        Image storedImage = createImageEntity(storedFileUrl, targetShop.getId());
 
         return ApiResponse.builder()
                 .check(true)
                 .information(new ImageRes(storedImage.getId(), storedImage.getUrl()))
                 .build();
-    }
-
-    private void validShopAndIsOwner(Long shopId, UserPrincipal user) {
-        Shop targetShop = getShop(shopId);
-        Member owner = memberRepository.findById(user.getId()).orElseThrow(
-                () -> new IllegalStateException("해당 member가 존재하지 않습니다.")
-        );
-        if (targetShop != owner.getShop()) {
-            throw new IllegalStateException("해당 shop의 owner가 아닙니다.");
-        }
     }
 
     private Image createImageEntity(String url, Long shopId) {
@@ -64,5 +57,25 @@ public class ImageService {
         return shopRepository.findById(shopId).orElseThrow(
                 () -> new IllegalStateException("해당 shop이 존재하지 않습니다.")
         );
+    }
+
+    @Transactional
+    public String delete(Long id, UserPrincipal user) {
+        Member owner = memberRepository.findById(
+                user.getId()).orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
+
+        Shop ownerShop = owner.getShop();
+        Image targetImage = imageRepository.findById(id).orElseThrow(
+                () -> new IllegalStateException("해당 사진이 없습니다.")
+        );
+
+        if (!targetImage.getShop().equals(ownerShop))
+            throw new IllegalStateException("사진의 매장과 일치하지 않습니다.");
+
+        System.out.println("targetImage.getUrl() = " + targetImage.getUrl());
+        s3Uploader.deleteS3Object(targetImage.getUrl());
+        targetImage.updateStatus(Status.DELETE);
+
+        return "삭제 완료";
     }
 }

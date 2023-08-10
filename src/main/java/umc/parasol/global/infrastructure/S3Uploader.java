@@ -29,6 +29,9 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.s3.prefix}")
+    private String prefix;
+
     public String outerUpload(MultipartFile multipartFile, String dirName, UserPrincipal user) throws IOException {
         File uploadFile = convert(multipartFile, user)
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
@@ -69,9 +72,9 @@ public class S3Uploader {
         return Optional.empty();
     }
 
-    /*
-    private void deleteS3ObjectIfExisted(String url) {
-        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, url));
+    public void deleteS3Object(String url) {
+        String key = url.replace(prefix, "");
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, key));
     }
-     */
+
 }

@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import umc.parasol.domain.image.application.ImageService;
 import umc.parasol.domain.shop.application.ShopSearchService;
 import umc.parasol.domain.shop.application.ShopService;
-import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.dto.*;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
@@ -75,11 +74,21 @@ public class ShopController {
     }
 
     // 매장 사진 업로드
-    @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> imageUpload(@RequestParam(value = "image")
-                                         MultipartFile file, @PathVariable Long id, @CurrentUser UserPrincipal user) {
+                                         MultipartFile file, @CurrentUser UserPrincipal user) {
         try {
-            return ResponseEntity.ok(imageService.upload(id, file, user));
+            return ResponseEntity.ok(imageService.upload(file, user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 매장 사진 삭제
+    @DeleteMapping("/image/{id}")
+    public ResponseEntity<?> imageDelete(@PathVariable Long id, @CurrentUser UserPrincipal user) {
+        try {
+            return ResponseEntity.ok(imageService.delete(id, user));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
