@@ -14,6 +14,7 @@ import umc.parasol.domain.verify.domain.Verify;
 import umc.parasol.domain.verify.domain.repository.VerifyRepository;
 import umc.parasol.domain.verify.dto.CheckReq;
 import umc.parasol.domain.verify.dto.VerifyReq;
+import umc.parasol.domain.verify.dto.VerifyResponse;
 import umc.parasol.global.payload.ApiResponse;
 
 import java.time.LocalDateTime;
@@ -50,9 +51,14 @@ public class VerifyService {
         removePreviousVerifies(findMember);
         Verify newVerify = createVerify(code, findMember);
         verifyRepository.save(newVerify);
+        VerifyResponse response = VerifyResponse.of(
+                newVerify.getCode(),
+                findMember.getNickname(),
+                newVerify.getCreatedAt(),
+                newVerify.getExpirationTime());
         sendMessage(verifyReq, code);
 
-        return new ApiResponse(true, newVerify);
+        return new ApiResponse(true, response);
     }
 
     private void removePreviousVerifies(Member findMember) {
