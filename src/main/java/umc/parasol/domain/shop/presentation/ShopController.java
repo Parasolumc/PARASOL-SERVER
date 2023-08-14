@@ -13,6 +13,7 @@ import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -61,9 +62,9 @@ public class ShopController {
     @GetMapping("/search")
     public ResponseEntity<?> searchShop(
             @CurrentUser UserPrincipal userPrincipal,
-            @RequestBody SearchShopReq searchShopReq) {
+            @RequestParam String keyword, @RequestParam BigDecimal lat, @RequestParam BigDecimal lon) {
 
-        List<SearchShopRes> searchShopRes = shopSearchService.getSearchShop(userPrincipal, searchShopReq);
+        List<SearchShopRes> searchShopRes = shopSearchService.getSearchShop(userPrincipal, keyword, lat, lon);
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)

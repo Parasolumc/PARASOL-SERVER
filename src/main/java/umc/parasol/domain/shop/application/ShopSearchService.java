@@ -28,16 +28,17 @@ public class ShopSearchService {
 
     /**
      * 매장 검색 결과 조회
-     * @param userPrincipal api 호출하는 사용자 객체
-     * @param searchShopReq 매장 검색 dto
-     */
-    public List<SearchShopRes> getSearchShop(UserPrincipal userPrincipal, SearchShopReq searchShopReq) {
+    */
+    public List<SearchShopRes> getSearchShop(UserPrincipal userPrincipal,
+                                             String keyword,
+                                             BigDecimal lat,
+                                             BigDecimal lon) {
 
         findValidMember(userPrincipal.getId());
-        List<Shop> searchShopList = shopRepository.searchShopByKeyword(searchShopReq.getKeyword());
+        List<Shop> searchShopList = shopRepository.searchShopByKeyword(keyword);
 
         return searchShopList.stream()
-                .map(shop -> createSearchShopRes(shop, searchShopReq.getUserLatitude(), searchShopReq.getUserLongitude()))
+                .map(shop -> createSearchShopRes(shop, lat, lon))
                 .toList();
     }
 
