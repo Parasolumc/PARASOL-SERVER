@@ -127,11 +127,11 @@ public class HistoryService {
                 .fromShop(history.getFromShop().getName())
                 .endShop((endShop == null) ?
                         (history.getEndShop() == null
-                                ? null
+                                ? ""
                                 : history.getEndShop().getName())
                         : endShop.getName())
                 .createdAt(history.getCreatedAt())
-                .clearedAt(history.getClearedAt())
+                .clearedAt(history.getClearedAt() == null ? LocalDateTime.of(9999, 12, 31, 23, 59) : history.getClearedAt())
                 .process(history.getProcess())
                 .build();
     }
