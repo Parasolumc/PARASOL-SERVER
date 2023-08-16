@@ -119,6 +119,7 @@ public class AuthSignService {
         return AuthRes.builder()
                 .accessToken(tokenMapping.getAccessToken())
                 .refreshToken(tokenMapping.getRefreshToken())
+                .role(findMember.getRole())
                 .build();
     }
 
