@@ -20,6 +20,7 @@ public class Image extends BaseEntity {
     @Column(name = "image_id")
     private Long id;
 
+    @Lob
     @NotBlank(message = "관련 파일 url이 설정되어 있어야 합니다.")
     private String url;
 

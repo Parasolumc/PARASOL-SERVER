@@ -16,6 +16,7 @@ import umc.parasol.global.config.security.token.UserPrincipal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Optional;
 
 @Slf4j
@@ -62,7 +63,21 @@ public class S3Uploader {
     }
 
     private Optional<File> convert(MultipartFile file, UserPrincipal user) throws IOException {
-        File convertFile = new File(user.getId() + "_" + file.getOriginalFilename());
+        String originalFilename = file.getOriginalFilename();
+
+        // 확장자 추출
+        String fileExtension = "";
+        int lastDotIndex = originalFilename.lastIndexOf(".");
+        if (lastDotIndex > 0) {
+            fileExtension = originalFilename.substring(lastDotIndex);
+        }
+
+        // UTF-8로 인코딩된 파일 이름 생성
+        String encodedFilename = user.getId() + "_" + URLEncoder.encode(originalFilename, "UTF-8") + fileExtension;
+
+        File convertFile = new File(encodedFilename);
+
+        removeNewFile(convertFile);
         if (convertFile.createNewFile()) {
             try (FileOutputStream fos = new FileOutputStream(convertFile)) {
                 fos.write(file.getBytes());
