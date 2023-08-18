@@ -13,12 +13,15 @@ public class AuthRes {
 
     private Role role;
 
+    private Long memberId;
+
 
     @Builder
-    public AuthRes(String accessToken, String refreshToken, Role role) {
+    public AuthRes(String accessToken, String refreshToken, Role role, Long memberId) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.role = role;
+        this.memberId = memberId;
     }
 
 }
