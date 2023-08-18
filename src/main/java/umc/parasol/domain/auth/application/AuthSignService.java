@@ -120,6 +120,7 @@ public class AuthSignService {
                 .accessToken(tokenMapping.getAccessToken())
                 .refreshToken(tokenMapping.getRefreshToken())
                 .role(findMember.getRole())
+                .memberId(findMember.getId())
                 .build();
     }
 
