@@ -18,7 +18,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/shop")
+@RequestMapping("/api")
 public class ShopController {
 
     private final ShopService shopService;
@@ -27,8 +27,9 @@ public class ShopController {
 
     private final ImageService imageService;
 
+
     // 매장 리스트 조회
-    @GetMapping
+    @GetMapping("/shop")
     public ResponseEntity<?> getShopList(
             @CurrentUser UserPrincipal userPrincipal) {
 
@@ -43,7 +44,7 @@ public class ShopController {
     }
 
     // 특정 매장 조회
-    @GetMapping("/{id}")
+    @GetMapping("/shop/{id}")
     public ResponseEntity<?> getShop(
             @CurrentUser UserPrincipal userPrincipal,
             @PathVariable(value = "id") Long shopId) {
@@ -59,7 +60,7 @@ public class ShopController {
     }
 
     // 매장 검색 결과 조회
-    @GetMapping("/search")
+    @GetMapping("/shop/search")
     public ResponseEntity<?> searchShop(
             @CurrentUser UserPrincipal userPrincipal,
             @RequestParam String keyword, @RequestParam BigDecimal lat, @RequestParam BigDecimal lon) {
@@ -75,7 +76,7 @@ public class ShopController {
     }
 
     // 매장 사진 업로드
-    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/shop/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> imageUpload(@RequestParam(value = "image")
                                          MultipartFile file, @CurrentUser UserPrincipal user) {
         try {
@@ -86,7 +87,7 @@ public class ShopController {
     }
 
     // 매장 사진 삭제
-    @DeleteMapping("/image/{id}")
+    @DeleteMapping("/shop/image/{id}")
     public ResponseEntity<?> imageDelete(@PathVariable Long id, @CurrentUser UserPrincipal user) {
         try {
             return ResponseEntity.ok(imageService.delete(id, user));
@@ -96,7 +97,7 @@ public class ShopController {
     }
 
     // 사장님 본인 매장 조회
-    @GetMapping(value = "/owner")
+    @GetMapping(value = "/shop/owner")
     public ResponseEntity<?> getOwnerShop(@CurrentUser UserPrincipal userPrincipal){
         try {
             ShopRes shopRes = shopService.getShopById(userPrincipal);
@@ -111,7 +112,7 @@ public class ShopController {
     }
 
     // 매장 정보 수정
-    @PutMapping(value = "/info")
+    @PutMapping(value = "/shop/info")
     public ResponseEntity<?> changeShopInfo(@CurrentUser UserPrincipal userPrincipal, @RequestBody UpdateInfoReq updateInfoReq){
         try {
                 ShopRes updatedShop = shopService.updateInfo(userPrincipal, updateInfoReq);
@@ -120,6 +121,26 @@ public class ShopController {
                         .information(updatedShop)
                         .build();
                 return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 우산 대여
+    @PostMapping("/umbrella/rental/{id}")
+    public ResponseEntity<?> rentalUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(shopService.rentalUmbrella(user, id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 우산 반납
+    @PostMapping("/umbrella/return/{id}")
+    public ResponseEntity<?> returnUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(shopService.returnUmbrella(user, id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

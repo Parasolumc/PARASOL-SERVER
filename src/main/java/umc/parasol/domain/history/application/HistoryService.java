@@ -27,50 +27,7 @@ import java.util.List;
 public class HistoryService {
     private final HistoryRepository historyRepository;
     private final MemberRepository memberRepository;
-    private final ShopRepository shopRepository;
-    private final UmbrellaService umbrellaService;
 
-    // 손님이 우산 결제 진행
-    @Transactional
-    public ApiResponse rentalUmbrella(@CurrentUser UserPrincipal user, Long shopId) {
-        Shop targetShop = findShopById(shopId);
-        Member member = findMemberById(user.getId());
-        History history = rentalUmbrella(targetShop, member);
-        historyRepository.save(history);
-
-        HistoryRes record = makeHistoryRes(member, history, null);
-        return new ApiResponse(true, record);
-    }
-
-    // 손님이 우산 반납 진행
-    @Transactional
-    public ApiResponse returnUmbrella(@CurrentUser UserPrincipal user, Long shopId) {
-        Member member = findMemberById(user.getId());
-
-        List<History> remainHistoryList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member)
-                .stream()
-                .filter(history -> history.getProcess() != Process.CLEAR).toList();
-
-        if (remainHistoryList.isEmpty())
-            throw new IllegalStateException("처리되지 않은 우산 내역이 없습니다.");
-
-        History targetHistory = remainHistoryList.get(remainHistoryList.size() - 1);
-        Umbrella targetUmbrella = targetHistory.getUmbrella();
-        targetHistory.updateProcess(Process.CLEAR); // History CLEAR 상태로 변경
-
-        Shop originShop = targetHistory.getFromShop();
-        Shop targetShop = findShopById(shopId);
-
-        targetUmbrella.updateAvailable(true);
-
-        if (originShop != targetShop) { // 빌렸던 Shop과 다르다면
-            targetUmbrella.updateShop(targetShop);
-        }
-        targetHistory.updateClearedAt(LocalDateTime.now());
-        targetHistory.updateEndShop(targetShop);
-        HistoryRes record = makeHistoryRes(member, targetHistory, targetShop);
-        return new ApiResponse(true, record);
-    }
 
     // 손님의 대여 기록들 조회
     public ApiResponse historyList(@CurrentUser UserPrincipal user) {
@@ -108,13 +65,6 @@ public class HistoryService {
         }
     }
 
-
-    private Shop findShopById(Long shopId) {
-        return shopRepository.findById(shopId).orElseThrow(
-                () -> new IllegalStateException("해당 shop이 없습니다.")
-        );
-    }
-
     private Member findMemberById(Long memerId) {
         return memberRepository.findById(memerId).orElseThrow(
                 () -> new IllegalStateException("해당 member가 없습니다.")
@@ -136,14 +86,4 @@ public class HistoryService {
                 .build();
     }
 
-    private History rentalUmbrella(Shop targetShop, Member member) {
-        return History.builder()
-                .cost(0)
-                .process(Process.USE)
-                .fromShop(targetShop)
-                .endShop(null)
-                .member(member)
-                .umbrella(umbrellaService.getAnyFreeUmbrella(targetShop))
-                .build();
-    }
 }
