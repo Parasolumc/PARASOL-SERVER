@@ -135,4 +135,10 @@ public class AuthSignService {
     }
 
 
+    public RecoveryRes recovery(RecoveryReq request) {
+        Member targetMember = memberRepository.findByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new IllegalStateException("등록되지 않은 전화번호 입니다."));
+
+        return RecoveryRes.from(targetMember.getEmail(), targetMember.getNickname(), targetMember.getPhoneNumber());
+    }
 }

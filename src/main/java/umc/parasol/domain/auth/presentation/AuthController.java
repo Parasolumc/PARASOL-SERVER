@@ -106,4 +106,18 @@ public class AuthController {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    // 계정 (이메일) 복구
+    @PostMapping("/recovery")
+    public ResponseEntity<ApiResponse> recovery(@Valid @RequestBody RecoveryReq request) {
+
+        RecoveryRes recoveryRes = authService.recovery(request);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(recoveryRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }
