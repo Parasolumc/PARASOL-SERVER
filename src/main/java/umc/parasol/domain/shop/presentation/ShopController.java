@@ -18,7 +18,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/shop")
+@RequestMapping({"/api/shop", "/api/umbrella"})
 public class ShopController {
 
     private final ShopService shopService;
@@ -26,6 +26,7 @@ public class ShopController {
     private final ShopSearchService shopSearchService;
 
     private final ImageService imageService;
+
 
     // 매장 리스트 조회
     @GetMapping
@@ -120,6 +121,26 @@ public class ShopController {
                         .information(updatedShop)
                         .build();
                 return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 우산 대여
+    @PostMapping("/rental/{id}")
+    public ResponseEntity<?> rentalUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(shopService.rentalUmbrella(user, id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 우산 반납
+    @PostMapping("/return/{id}")
+    public ResponseEntity<?> returnUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(shopService.returnUmbrella(user, id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

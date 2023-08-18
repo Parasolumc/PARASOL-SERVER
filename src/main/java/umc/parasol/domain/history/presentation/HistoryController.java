@@ -13,25 +13,6 @@ import umc.parasol.global.config.security.token.UserPrincipal;
 public class HistoryController {
     private final HistoryService historyService;
 
-    // 손님이 우산 대여
-    @PostMapping("/rental/{id}")
-    public ResponseEntity<?> rentalUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(historyService.rentalUmbrella(user, id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    // 손님의 우산 반납
-    @PostMapping("/return/{id}")
-    public ResponseEntity<?> returnUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(historyService.returnUmbrella(user, id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
     // 손님의 대여 목록
     @GetMapping
