@@ -11,6 +11,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import umc.parasol.domain.auth.application.AuthSignService;
 import umc.parasol.domain.auth.application.AuthTokenService;
 import umc.parasol.domain.auth.dto.*;
+import umc.parasol.domain.verify.dto.CheckReq;
+import umc.parasol.domain.verify.dto.VerifyResponse;
 import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
@@ -102,6 +104,34 @@ public class AuthController {
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
                 .information(authRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    // 계정 (이메일) 복구
+    @PostMapping("/recovery")
+    public ResponseEntity<ApiResponse> recovery(@Valid @RequestBody RecoveryReq request) {
+
+        VerifyResponse response = authService.recovery(request);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(response)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    // 계정 이메일 복구 확인
+    @PostMapping("/recovery/check")
+    public ResponseEntity<ApiResponse> recoveryCheck(@Valid @RequestBody CheckReq request) {
+
+        RecoveryRes response = authService.recoveryCheck(request);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(response)
                 .build();
 
         return ResponseEntity.ok(apiResponse);
