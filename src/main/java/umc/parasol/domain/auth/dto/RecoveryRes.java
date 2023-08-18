@@ -8,17 +8,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecoveryRes {
 
+    private Long id;
     private String email;
-    private String nickname;
-    private String phoneNumber;
 
-    public static RecoveryRes from(String email, String nickname, String phoneNumber) {
-        return new RecoveryRes(email, nickname, phoneNumber);
+    public static RecoveryRes from(Long id, String email) {
+        return new RecoveryRes(id, email);
     }
 
-    private RecoveryRes(String email, String nickname, String phoneNumber) {
+    private RecoveryRes(Long id, String email) {
+        this.id = id;
         this.email = email;
-        this.nickname = nickname;
-        this.phoneNumber = phoneNumber;
     }
 }

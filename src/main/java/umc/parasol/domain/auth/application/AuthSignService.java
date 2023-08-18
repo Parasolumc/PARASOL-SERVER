@@ -16,6 +16,10 @@ import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
+import umc.parasol.domain.verify.application.VerifyService;
+import umc.parasol.domain.verify.dto.CheckReq;
+import umc.parasol.domain.verify.dto.VerifyReq;
+import umc.parasol.domain.verify.dto.VerifyResponse;
 import umc.parasol.global.DefaultAssert;
 
 import java.util.Optional;
@@ -34,6 +38,7 @@ public class AuthSignService {
     private final TokenRepository tokenRepository;
 
     private final CustomTokenProviderService customTokenProviderService;
+    private final VerifyService verifyService;
 
     private final ShopRepository shopRepository;
 
@@ -134,11 +139,23 @@ public class AuthSignService {
         tokenRepository.delete(token.get());
     }
 
+    @Transactional
+    // 복구 요청
+    public VerifyResponse recovery(RecoveryReq request) {
+        Member targetMember = memberRepository.findByName(request.getName())
+                .orElseThrow(() -> new IllegalStateException("등록되지 않은 이름입니다."));
+        Optional<Member> numberOwner = memberRepository.findByPhoneNumber(request.getPhoneNumber());
+        if (numberOwner.isPresent() && !numberOwner.get().getName().equals(request.getName()))
+            throw new IllegalStateException("이미 등록된 전화번호지만, 이름이 다릅니다.");
+        return verifyService.recoveryVerify(targetMember);
+    }
 
-    public RecoveryRes recovery(RecoveryReq request) {
-        Member targetMember = memberRepository.findByPhoneNumber(request.getPhoneNumber())
+    @Transactional
+    // 복구 확인 요청
+    public RecoveryRes recoveryCheck(CheckReq checkReq) {
+        verifyService.check(checkReq);
+        Member member = memberRepository.findByPhoneNumber(checkReq.getPhoneNumber())
                 .orElseThrow(() -> new IllegalStateException("등록되지 않은 전화번호 입니다."));
-
-        return RecoveryRes.from(targetMember.getEmail(), targetMember.getNickname(), targetMember.getPhoneNumber());
+        return RecoveryRes.from(member.getId(), member.getEmail());
     }
 }

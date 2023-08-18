@@ -61,6 +61,24 @@ public class VerifyService {
         return new ApiResponse(true, response);
     }
 
+    // ID 복구용 인증
+    @Transactional
+    public VerifyResponse recoveryVerify(Member member) {
+        int code = generateVerifyCode();
+        removePreviousVerifies(member);
+        Verify newVerify = createVerify(code, member);
+        verifyRepository.save(newVerify);
+        VerifyResponse response = VerifyResponse.of(
+                newVerify.getCode(),
+                member.getNickname(),
+                newVerify.getCreatedAt(),
+                newVerify.getExpirationTime());
+        VerifyReq verifyReq = new VerifyReq(member.getName(), member.getEmail(), member.getPhoneNumber());
+        sendMessage(verifyReq, code);
+
+        return response;
+    }
+
     private void removePreviousVerifies(Member findMember) {
         Verify findVerify = verifyRepository.findByMemberId(findMember.getId());
         if (findVerify != null)
@@ -102,8 +120,8 @@ public class VerifyService {
         if (!existMember.getId().equals(findMember.getId()))
             throw new IllegalStateException("유저 정보가 일치하지 않습니다.");
 
-        if (findMember.getIsVerified())
-            throw new IllegalStateException("이미 인증되었습니다.");
+//        if (findMember.getIsVerified())
+//            throw new IllegalStateException("이미 인증되었습니다.");
 
         findMember.updateIsVerified(true);
 
