@@ -6,6 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.notification.application.NotificationService;
+import umc.parasol.domain.notification.domain.Notification;
+import umc.parasol.domain.notification.domain.NotificationType;
+import umc.parasol.domain.notification.domain.repository.NotificationRepository;
 import umc.parasol.domain.sell.domain.Sell;
 import umc.parasol.domain.sell.domain.repository.SellRepository;
 import umc.parasol.domain.sell.dto.SellHistoryRes;
@@ -32,6 +36,8 @@ public class SellService {
     private final SellRepository sellRepository;
     private final ShopRepository shopRepository;
     private final UmbrellaRepository umbrellaRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     /**
      * 우산 판매
@@ -55,6 +61,10 @@ public class SellService {
                 .build();
 
         sellRepository.save(sell);
+
+        //알림 생성
+        Notification notification = notificationService.makeNotification(targetShop, findMember, NotificationType.SALE_COMPLETED);
+        notificationRepository.save(notification);
 
         return SellResultRes.builder()
                 .shopName(targetShop.getName())

@@ -234,6 +234,7 @@ public class ShopService {
         History history = rentalUmbrella(targetShop, member);
         historyRepository.save(history);
 
+        //알림 생성
         Notification notification = notificationService.makeNotification(targetShop, member, NotificationType.RENT_COMPLETED);
         notificationRepository.save(notification);
 
@@ -275,6 +276,7 @@ public class ShopService {
         targetHistory.updateEndShop(targetShop);
         HistoryRes record = makeHistoryRes(member, targetHistory, targetShop);
 
+        //알림 생성
         Notification notification = notificationService.makeNotification(targetShop, member, NotificationType.RETURN_COMPLETED);
         notificationRepository.save(notification);
 
