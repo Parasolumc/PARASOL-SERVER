@@ -2,8 +2,13 @@ package umc.parasol.domain.notification.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.parasol.domain.history.domain.History;
+import umc.parasol.domain.history.domain.Process;
+import umc.parasol.domain.history.domain.repository.HistoryRepository;
+import umc.parasol.domain.history.dto.HistoryRes;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.notification.domain.Notification;
@@ -13,6 +18,7 @@ import umc.parasol.domain.notification.dto.NotificationRes;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.global.config.security.token.UserPrincipal;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,6 +30,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
+    private final HistoryRepository historyRepository;
 
     // 유효한 사용자인지 체크하는 메서드
     private Member findValidMember(Long memberId) {
@@ -103,4 +110,37 @@ public class NotificationService {
                 .shop(targetShop)
                 .build();
     }
+
+    /**
+     * 무료 대여 3시간 알림 계산 및 설정 -> 10분 마다 호출한다고 가정
+     * 테스트: notificationService.threeHourLeft(user); 를 어디선가 실행해보면 됨(완료)
+     */
+    @Transactional
+    public void threeHourLeft(UserPrincipal user) {
+        Member member = findMemberById(user.getId());
+        List<History> historyList = historyRepository.findAllByMemberOrderByCreatedAtAsc(member); //대여기록 오름차순 정렬
+        LocalDateTime timeNow = LocalDateTime.now(); //현재 시간
+        log.info("threeHourLeft 실행");
+        for (History history : historyList) { //제일 오래 전 대여 기록부터
+            if(history.getProcess() == Process.USE){
+                LocalDateTime timeCreated = history.getCreatedAt(); //대여 시간
+                Duration duration = Duration.between(timeCreated, timeNow);
+                // 남은 시간이 3시간 ~ 2시간 50분일 때
+                if(duration.getSeconds() >= 75600 && duration.getSeconds() < 76200) {
+                    log.info("3시간 알림 생성!");
+                    Notification notification = makeNotification(history.getFromShop(), member, NotificationType.FREE_RENTAL_END);
+                    notificationRepository.save(notification);
+                }
+            }
+        }
+
+
+    }
+
+    private Member findMemberById(Long memerId) {
+        return memberRepository.findById(memerId).orElseThrow(
+                () -> new IllegalStateException("해당 member가 없습니다.")
+        );
+    }
+
 }
