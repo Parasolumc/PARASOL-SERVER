@@ -3,6 +3,7 @@ package umc.parasol.domain.shop.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.parasol.domain.common.Status;
 import umc.parasol.domain.history.domain.History;
 import umc.parasol.domain.history.domain.Process;
 import umc.parasol.domain.history.domain.repository.HistoryRepository;
@@ -15,6 +16,10 @@ import umc.parasol.domain.member.domain.repository.MemberRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.*;
+import umc.parasol.domain.timetable.domain.repository.TimeTableRepository;
+import umc.parasol.domain.timetable.dto.TimeTable;
+import umc.parasol.domain.timetable.dto.TimeTableReq;
+import umc.parasol.domain.timetable.dto.TimeTableRes;
 import umc.parasol.domain.umbrella.application.UmbrellaService;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
@@ -43,7 +48,7 @@ public class ShopService {
     private final HistoryRepository historyRepository;
 
     private final UmbrellaService umbrellaService;
-
+    private final TimeTableRepository timeTableRepository;
 
     /**
      * 매장 리스트 조회
@@ -110,16 +115,17 @@ public class ShopService {
 
     // ShopList 응답을 생성해주는 메서드
     private ShopListRes createShopListRes(Shop shop) {
-        String openTime = shop.getOpenTime() != null ? shop.getOpenTime() : "";
-        String closeTime = shop.getCloseTime() != null ? shop.getCloseTime() : "";
+        List<TimeTableRes> times = timeTableRepository.findAllByShop(shop)
+                .stream().map(time -> {
+                    return TimeTableRes.dayAndTime(time.getDay(), time.getOpenTime(), time.getEndTime());
+                }).toList();
         return ShopListRes.builder()
                 .id(shop.getId())
                 .shopName(shop.getName())
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .roadNameAddress(shop.getRoadNameAddress())
-                .openTime(openTime)
-                .closeTime(closeTime)
+                .times(times)
                 .availableUmbrella(getAvailableUmbrella(shop).size())
                 .unavailableUmbrella(getUmbrella(shop).size() - getAvailableUmbrella(shop).size())
                 .build();
@@ -128,8 +134,7 @@ public class ShopService {
     // Shop 응답을 생성해주는 메서드
     private ShopRes createShopRes(Shop shop, List<ImageRes> imageResList) {
         String desc = shop.getDescription() != null ? shop.getDescription() : "";
-        String openTime = shop.getOpenTime() != null ? shop.getOpenTime() : "";
-        String closeTime = shop.getCloseTime() != null ? shop.getCloseTime() : "";
+        List<TimeTable> times = timeTableRepository.findAllByShop(shop);
         return ShopRes.builder()
                 .id(shop.getId())
                 .shopName(shop.getName())
@@ -137,8 +142,9 @@ public class ShopService {
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .roadNameAddress(shop.getRoadNameAddress())
-                .openTime(openTime)
-                .closeTime(closeTime)
+                .times(times.stream().map(time -> {
+                    return TimeTableRes.dayAndTime(time.getDay(), time.getOpenTime(), time.getEndTime());
+                }).toList())
                 .availableUmbrella(getAvailableUmbrella(shop).size())
                 .image(imageResList)
                 .build();
@@ -183,8 +189,16 @@ public class ShopService {
         Shop shop = findValidShopForOwner(member);
 
         shop.updateDescription(updateInfoReq.getDesc());
-        shop.updateOpenTime(updateInfoReq.getOpenTime());
-        shop.updateCloseTime(updateInfoReq.getCloseTime());
+
+        List<TimeTable> previousTimeTables = timeTableRepository.findAllByShop(shop);
+        for (TimeTable table : previousTimeTables) {
+            table.updateStatus(Status.DELETE);
+        }
+
+        for (TimeTableReq time : updateInfoReq.getTimes()) {
+            TimeTable newTime = TimeTable.from(time.getDay(), time.getOpenTime(), time.getEndTime(), shop);
+            timeTableRepository.save(newTime);
+        }
 
         Shop updatedShop = shopRepository.save(shop);
 
@@ -195,8 +209,6 @@ public class ShopService {
                 .toList();
 
         return createShopRes(updatedShop, imageResList);
-
-
     }
 
     /**
