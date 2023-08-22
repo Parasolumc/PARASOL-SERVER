@@ -39,19 +39,7 @@ public class Shop extends BaseEntity {
 
     private String description;
 
-    private String openTime;
-
-    private String closeTime;
-
     public void updateDescription(String description) {
         this.description = description;
-    }
-
-    public void updateOpenTime(String openTime) {
-        this.openTime = openTime;
-    }
-
-    public void updateCloseTime(String closeTime) {
-        this.closeTime = closeTime;
     }
 }

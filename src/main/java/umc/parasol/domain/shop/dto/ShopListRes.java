@@ -2,8 +2,10 @@ package umc.parasol.domain.shop.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import umc.parasol.domain.timetable.dto.TimeTableRes;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class ShopListRes {
@@ -18,23 +20,23 @@ public class ShopListRes {
 
     private String roadNameAddress;
 
-    private String openTime;
-
-    private String closeTime;
+   private List<TimeTableRes> times;
 
     private int availableUmbrella;
 
     private int unavailableUmbrella;
 
     @Builder
-    public ShopListRes(Long id, String shopName, BigDecimal latitude, BigDecimal longitude, String roadNameAddress, String openTime, String closeTime, int availableUmbrella, int unavailableUmbrella) {
+    public ShopListRes(Long id, String shopName, BigDecimal latitude,
+                       BigDecimal longitude, String roadNameAddress,
+                       List<TimeTableRes> times,
+                       int availableUmbrella, int unavailableUmbrella) {
         this.id = id;
         this.shopName = shopName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.roadNameAddress = roadNameAddress;
-        this.openTime = openTime;
-        this.closeTime = closeTime;
+        this.times = times;
         this.availableUmbrella = availableUmbrella;
         this.unavailableUmbrella = unavailableUmbrella;
     }

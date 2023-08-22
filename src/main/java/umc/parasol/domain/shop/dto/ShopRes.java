@@ -3,6 +3,7 @@ package umc.parasol.domain.shop.dto;
 import lombok.Builder;
 import lombok.Data;
 import umc.parasol.domain.image.dto.ImageRes;
+import umc.parasol.domain.timetable.dto.TimeTableRes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,13 +24,9 @@ public class ShopRes {
 
     private String roadNameAddress;
 
-    private String openTime;
-
-    private String closeTime;
-
     private int availableUmbrella;
 
     private List<ImageRes> image;
 
-
+    private List<TimeTableRes> times;
 }
