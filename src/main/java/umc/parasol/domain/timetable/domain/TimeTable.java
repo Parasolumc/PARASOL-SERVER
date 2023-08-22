@@ -1,4 +1,4 @@
-package umc.parasol.domain.timetable.dto;
+package umc.parasol.domain.timetable.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import umc.parasol.domain.common.BaseEntity;
 import umc.parasol.domain.shop.domain.Shop;
-import umc.parasol.domain.timetable.domain.Day;
 
 @Entity
 @Builder
@@ -30,7 +29,7 @@ public class TimeTable extends BaseEntity {
     private Long id;
 
     @Enumerated(value = EnumType.STRING)
-    private Day day;
+    private Day date;
     private String openTime;
     private String endTime;
     
@@ -38,8 +37,8 @@ public class TimeTable extends BaseEntity {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    private TimeTable(Day day, String openTime, String endTime, Shop shop) {
-        this.day = day;
+    private TimeTable(Day date, String openTime, String endTime, Shop shop) {
+        this.date = date;
         this.openTime = openTime;
         this.endTime = endTime;
         this.shop = shop;

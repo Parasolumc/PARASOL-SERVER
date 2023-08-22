@@ -13,11 +13,16 @@ import umc.parasol.domain.image.domain.repository.ImageRepository;
 import umc.parasol.domain.image.dto.ImageRes;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.notification.application.NotificationService;
+import umc.parasol.domain.notification.domain.Notification;
+import umc.parasol.domain.notification.domain.NotificationType;
+import umc.parasol.domain.notification.domain.repository.NotificationRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.*;
+import umc.parasol.domain.timetable.domain.TimeTable;
 import umc.parasol.domain.timetable.domain.repository.TimeTableRepository;
-import umc.parasol.domain.timetable.dto.TimeTable;
+
 import umc.parasol.domain.timetable.dto.TimeTableReq;
 import umc.parasol.domain.timetable.dto.TimeTableRes;
 import umc.parasol.domain.umbrella.application.UmbrellaService;
@@ -27,7 +32,6 @@ import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +53,9 @@ public class ShopService {
 
     private final UmbrellaService umbrellaService;
     private final TimeTableRepository timeTableRepository;
+
+    private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
 
     /**
      * 매장 리스트 조회
@@ -117,7 +124,7 @@ public class ShopService {
     private ShopListRes createShopListRes(Shop shop) {
         List<TimeTableRes> times = timeTableRepository.findAllByShop(shop)
                 .stream().map(time -> {
-                    return TimeTableRes.dayAndTime(time.getDay(), time.getOpenTime(), time.getEndTime());
+                    return TimeTableRes.dayAndTime(time.getDate(), time.getOpenTime(), time.getEndTime());
                 }).toList();
         return ShopListRes.builder()
                 .id(shop.getId())
@@ -143,7 +150,7 @@ public class ShopService {
                 .longitude(shop.getLongitude())
                 .roadNameAddress(shop.getRoadNameAddress())
                 .times(times.stream().map(time -> {
-                    return TimeTableRes.dayAndTime(time.getDay(), time.getOpenTime(), time.getEndTime());
+                    return TimeTableRes.dayAndTime(time.getDate(), time.getOpenTime(), time.getEndTime());
                 }).toList())
                 .availableUmbrella(getAvailableUmbrella(shop).size())
                 .image(imageResList)
@@ -227,6 +234,9 @@ public class ShopService {
         History history = rentalUmbrella(targetShop, member);
         historyRepository.save(history);
 
+        Notification notification = notificationService.makeNotification(targetShop, member, NotificationType.RENT_COMPLETED);
+        notificationRepository.save(notification);
+
         HistoryRes record = makeHistoryRes(member, history, null);
         return new ApiResponse(true, record);
     }
@@ -264,6 +274,10 @@ public class ShopService {
         targetHistory.updateClearedAt(LocalDateTime.now());
         targetHistory.updateEndShop(targetShop);
         HistoryRes record = makeHistoryRes(member, targetHistory, targetShop);
+
+        Notification notification = notificationService.makeNotification(targetShop, member, NotificationType.RETURN_COMPLETED);
+        notificationRepository.save(notification);
+
         return new ApiResponse(true, record);
     }
 
