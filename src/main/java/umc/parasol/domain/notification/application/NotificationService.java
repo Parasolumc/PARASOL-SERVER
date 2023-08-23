@@ -3,6 +3,7 @@ package umc.parasol.domain.notification.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cglib.core.Local;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.history.domain.History;
@@ -115,27 +116,28 @@ public class NotificationService {
      * 무료 대여 3시간 알림 계산 및 설정 -> 10분 마다 호출한다고 가정
      * 테스트: notificationService.threeHourLeft(user); 를 어디선가 실행해보면 됨(완료)
      */
-    @Transactional
-    public void threeHourLeft(UserPrincipal user) {
-        Member member = findMemberById(user.getId());
-        List<History> historyList = historyRepository.findAllByMemberOrderByCreatedAtAsc(member); //대여기록 오름차순 정렬
-        LocalDateTime timeNow = LocalDateTime.now(); //현재 시간
-        log.info("threeHourLeft 실행");
-        for (History history : historyList) { //제일 오래 전 대여 기록부터
-            if(history.getProcess() == Process.USE){
-                LocalDateTime timeCreated = history.getCreatedAt(); //대여 시간
-                Duration duration = Duration.between(timeCreated, timeNow);
-                // 남은 시간이 3시간 ~ 2시간 50분일 때
-                if(duration.getSeconds() >= 75600 && duration.getSeconds() < 76200) {
-                    log.info("3시간 알림 생성!");
-                    Notification notification = makeNotification(history.getFromShop(), member, NotificationType.FREE_RENTAL_END);
-                    notificationRepository.save(notification);
-                }
-            }
-        }
-
-
-    }
+//    @Transactional
+//    @Scheduled(cron = "* 0/10 * * * ?") //10분마다 해당 메소드 실행
+//    public void threeHourLeft(UserPrincipal user) {
+//        Member member = findMemberById(user.getId());
+//        List<History> historyList = historyRepository.findAllByMemberOrderByCreatedAtAsc(member); //대여기록 오름차순 정렬
+//        LocalDateTime timeNow = LocalDateTime.now(); //현재 시간
+//        log.info("threeHourLeft 실행");
+//        for (History history : historyList) { //제일 오래 전 대여 기록부터
+//            if(history.getProcess() == Process.USE){
+//                LocalDateTime timeCreated = history.getCreatedAt(); //대여 시간
+//                Duration duration = Duration.between(timeCreated, timeNow);
+//                // 남은 시간이 3시간 ~ 2시간 50분일 때
+//                if(duration.getSeconds() >= 75600 && duration.getSeconds() < 76200) {
+//                    log.info("3시간 알림 생성!");
+//                    Notification notification = makeNotification(history.getFromShop(), member, NotificationType.FREE_RENTAL_END);
+//                    notificationRepository.save(notification);
+//                }
+//            }
+//        }
+//
+//
+//    }
 
     private Member findMemberById(Long memerId) {
         return memberRepository.findById(memerId).orElseThrow(
