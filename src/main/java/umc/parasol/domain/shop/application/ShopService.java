@@ -13,6 +13,10 @@ import umc.parasol.domain.image.domain.repository.ImageRepository;
 import umc.parasol.domain.image.dto.ImageRes;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.notification.application.NotificationService;
+import umc.parasol.domain.notification.domain.Notification;
+import umc.parasol.domain.notification.domain.NotificationType;
+import umc.parasol.domain.notification.domain.repository.NotificationRepository;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.shop.dto.*;
@@ -49,6 +53,8 @@ public class ShopService {
 
     private final UmbrellaService umbrellaService;
     private final TimeTableRepository timeTableRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     /**
      * 매장 리스트 조회
