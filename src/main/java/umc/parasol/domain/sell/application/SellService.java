@@ -42,14 +42,15 @@ public class SellService {
     /**
      * 우산 판매
      * @param userPrincipal api 호출 사용자 객체
-     * @param shopId 판매할 매장 ID
+     * @param memberId 판매할 손님 ID
      */
     @Transactional
-    public SellResultRes sellUmbrella(UserPrincipal userPrincipal, Long shopId) {
+    public SellResultRes sellUmbrella(UserPrincipal userPrincipal, Long memberId) {
 
-        Member findMember = getCustomer(userPrincipal);
+        Member findOwner = getOwner(userPrincipal);
+        Member findMember = getCustomer(memberId);
 
-        Shop targetShop = getShop(shopId);
+        Shop targetShop = findOwner.getShop();
 
         Umbrella newUmbrella = Umbrella.createUmbrella(targetShop);
         umbrellaRepository.save(newUmbrella);
@@ -76,7 +77,7 @@ public class SellService {
 
     //손님이 여태까지 판매한 우산 조회
     public ApiResponse sellList(@CurrentUser UserPrincipal user){
-        Member member = getCustomer(user);
+        Member member = getCustomer(user.getId());
         List<Sell> sellList = sellRepository.findAllByMemberIdOrderByCreatedAtDesc(member.getId());
         List<SellHistoryRes> historyResList = new ArrayList<>(); //중복 있는 리스트
         List<SellHistoryRes> resultList = new ArrayList<>(); //반환할 리스트(중복제거)
@@ -121,14 +122,26 @@ public class SellService {
 
 
     // 현재 로그인 한 멤버를 가져오는 메서드, 사장님이면 예외 처리
-    private Member getCustomer(UserPrincipal user) {
+    private Member getCustomer(Long memberId) {
 
-        Optional<Member> member = memberRepository.findById(user.getId());
+        Optional<Member> member = memberRepository.findById(memberId);
         DefaultAssert.isTrue(member.isPresent(), "사용자가 올바르지 않습니다.");
         Member findMember = member.get();
 
         if (findMember.getRole() == Role.OWNER) {
-            throw new IllegalStateException("일반 사용자만 판매가 가능합니다.");
+            throw new IllegalStateException("일반 사용자애게만 판매가 가능합니다.");
+        }
+
+        return findMember;
+    }
+
+    private Member getOwner(UserPrincipal user) {
+        Optional<Member> owner = memberRepository.findById(user.getId());
+        DefaultAssert.isTrue(owner.isPresent(), "사용자가 올바르지 않습니다.");
+        Member findMember = owner.get();
+
+        if (findMember.getRole() == Role.CUSTOMER) {
+            throw new IllegalStateException("판매 시에는 점주만 로그인 가능합니다.");
         }
 
         return findMember;
