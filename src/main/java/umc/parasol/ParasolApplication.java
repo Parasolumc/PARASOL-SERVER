@@ -10,8 +10,8 @@ import umc.parasol.global.config.YamlPropertySourceFactory;
 @SpringBootApplication
 @EnableJpaAuditing
 //@EnableScheduling
-@PropertySource(value = {"classpath:database/application-database.yml"}, factory = YamlPropertySourceFactory.class)
-@PropertySource(value = {"classpath:auth/application-auth.yml"}, factory = YamlPropertySourceFactory.class)
+/*@PropertySource(value = {"classpath:database/application-database.yml"}, factory = YamlPropertySourceFactory.class)
+@PropertySource(value = {"classpath:auth/application-auth.yml"}, factory = YamlPropertySourceFactory.class)*/
 public class ParasolApplication {
 
 	public static void main(String[] args) {
