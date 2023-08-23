@@ -9,6 +9,7 @@ import umc.parasol.domain.history.dto.HistoryRes;
 import umc.parasol.domain.history.domain.repository.HistoryRepository;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.notification.application.NotificationService;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
 import umc.parasol.domain.umbrella.application.UmbrellaService;
@@ -27,6 +28,7 @@ import java.util.List;
 public class HistoryService {
     private final HistoryRepository historyRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
 
     // 손님의 대여 기록들 조회
