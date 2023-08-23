@@ -7,6 +7,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Getter
 @MappedSuperclass
@@ -27,4 +29,18 @@ public abstract class BaseEntity {
         this.status = status;
     }
 
+    @PrePersist
+    public void prePersist() {
+        ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime koreaDateTime = createdAt.atZone(koreaZoneId);
+        this.createdAt = koreaDateTime.toLocalDateTime();
+        this.modifiedAt = koreaDateTime.toLocalDateTime();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime koreaDateTime = ZonedDateTime.now(koreaZoneId);
+        this.modifiedAt = koreaDateTime.toLocalDateTime();
+    }
 }
