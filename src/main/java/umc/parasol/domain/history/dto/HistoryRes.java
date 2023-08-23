@@ -5,8 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.parasol.domain.history.domain.Process;
-
+import java.time.ZoneId;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @Getter
@@ -26,8 +27,11 @@ public class HistoryRes {
         this.member = member;
         this.fromShop = fromShop;
         this.endShop = endShop;
-        this.createdAt = createdAt;
-        this.clearedAt = clearedAt;
+
+        ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
+        this.createdAt = ZonedDateTime.of(createdAt, koreaZoneId).toLocalDateTime();
+        this.clearedAt = ZonedDateTime.of(clearedAt, koreaZoneId).toLocalDateTime();
+
         this.process = process;
     }
 }
