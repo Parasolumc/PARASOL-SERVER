@@ -19,5 +19,4 @@ public class NotificationRes {
     private Long shopId;
     private NotificationType type;
     private String shopName;  // 매장 이름
-    private String content; // 알림 내용
 }
