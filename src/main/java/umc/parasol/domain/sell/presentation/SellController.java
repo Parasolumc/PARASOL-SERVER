@@ -20,9 +20,9 @@ public class SellController {
     @PostMapping("/{id}")
     public ResponseEntity<?> sellUmbrella(
             @CurrentUser UserPrincipal userPrincipal,
-            @PathVariable(value = "id") Long shopId) {
+            @PathVariable(value = "id") Long memberId) {
 
-        SellResultRes sellResultRes = sellService.sellUmbrella(userPrincipal, shopId);
+        SellResultRes sellResultRes = sellService.sellUmbrella(userPrincipal, memberId);
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)

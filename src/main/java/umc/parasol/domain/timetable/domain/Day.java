@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public enum Day {
 
-    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+    MON, TUE, WED, THU, FRI, SAT, SUN, ALL, NORMAL, END
 }
