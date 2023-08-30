@@ -12,11 +12,12 @@ import java.time.LocalDateTime;
 public class NotificationRes {
     private Long id;
     private String content;
-
+  
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime sentTime;
-
     private Long recipientId;
     private Long shopId;
     private NotificationType type;
+    private String shopName;  // 매장 이름
+    private String content; // 알림 내용
 }
