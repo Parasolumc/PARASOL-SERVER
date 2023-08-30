@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 public class NotificationRes {
     private Long id;
-    private String content;
+    private String content; // 알림 내용
   
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime sentTime;
