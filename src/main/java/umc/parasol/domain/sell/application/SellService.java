@@ -45,12 +45,17 @@ public class SellService {
      * @param memberId 판매할 손님 ID
      */
     @Transactional
-    public SellResultRes sellUmbrella(UserPrincipal userPrincipal, Long memberId) {
+    public SellResultRes sellUmbrella(UserPrincipal userPrincipal, Long memberId, Long shopId) {
 
         Member findOwner = getOwner(userPrincipal);
         Member findMember = getCustomer(memberId);
 
         Shop targetShop = findOwner.getShop();
+
+        //손님이 선택한 매장 맞는지 검증
+        if(targetShop.getId() != shopId) {
+            throw new IllegalStateException("손님이 선택한 매장이 아닙니다.");
+        }
 
         Umbrella newUmbrella = Umbrella.createUmbrella(targetShop);
         umbrellaRepository.save(newUmbrella);
