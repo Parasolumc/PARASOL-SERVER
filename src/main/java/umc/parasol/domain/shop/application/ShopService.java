@@ -223,12 +223,17 @@ public class ShopService {
      * @param memberId 대여자 객체
      */
     @Transactional
-    public ApiResponse rentalUmbrella(@CurrentUser UserPrincipal user, Long memberId) {
+    public ApiResponse rentalUmbrella(@CurrentUser UserPrincipal user, Long memberId, Long shopId) {
 
         Member owner = findValidMember(user.getId()); //점주
         Shop targetShop = findValidShopForOwner(owner); //점주의 shop
 
         Member member = findValidMember(memberId); //대여자
+
+        //손님이 선택한 매장 맞는지 검증
+        if(targetShop.getId() != shopId) {
+            throw new IllegalStateException("손님이 선택한 매장이 아닙니다.");
+        }
 
         History history = rentalUmbrella(targetShop, member);
         historyRepository.save(history);
