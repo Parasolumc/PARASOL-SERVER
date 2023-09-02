@@ -92,6 +92,8 @@ public class SecurityConfig {
                         .permitAll()
                     .requestMatchers("/login/**", "/oauth2/**", "/oauth2/**")
                         .permitAll()
+                    .requestMatchers("/apple/**")
+                        .permitAll()
                     .requestMatchers("/auth/**")
                         .permitAll()
                     .requestMatchers("/verify/**")
