@@ -127,20 +127,20 @@ public class ShopController {
     }
 
     // 우산 대여
-    @PostMapping("/umbrella/rental/{id}")
-    public ResponseEntity<?> rentalUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+    @PostMapping("/umbrella/rental/{userId}/{shopId}")
+    public ResponseEntity<?> rentalUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long userId, @PathVariable Long shopId) {
         try {
-            return ResponseEntity.ok(shopService.rentalUmbrella(user, id));
+            return ResponseEntity.ok(shopService.rentalUmbrella(user, userId, shopId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     // 우산 반납
-    @PostMapping("/umbrella/return/{id}")
-    public ResponseEntity<?> returnUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long id) {
+    @PostMapping("/umbrella/return/{userId}/{shopId}")
+    public ResponseEntity<?> returnUmbrella(@CurrentUser UserPrincipal user, @PathVariable Long userId, @PathVariable Long shopId) {
         try {
-            return ResponseEntity.ok(shopService.returnUmbrella(user, id));
+            return ResponseEntity.ok(shopService.returnUmbrella(user, userId, shopId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
