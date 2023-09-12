@@ -43,6 +43,7 @@ public class NotificationService {
     private NotificationRes createNotificationRes(Notification notification) {
         return NotificationRes.builder()
                 .id(notification.getId())
+                .shopId(notification.getShop().getId())
                 .shopName(notification.getShop().getName())
                 .content(notification.getContent())
                 .sentTime(notification.getSentTime())
