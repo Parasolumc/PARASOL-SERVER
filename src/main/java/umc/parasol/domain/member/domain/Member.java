@@ -33,7 +33,6 @@ public class Member extends BaseEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "역할이 설정되어 있어야 합니다.")
     private Role role;
 
     @Enumerated(EnumType.STRING)
@@ -70,5 +69,13 @@ public class Member extends BaseEntity {
 
     public void updateName(String name) {
         this.name = name;
+    }
+
+    public void updateRole(String role) {
+        this.role = Role.valueOf(role);
+    }
+
+    public void updateShop(Shop shop) {
+        this.shop = shop;
     }
 }

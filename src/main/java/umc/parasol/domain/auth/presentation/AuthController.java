@@ -3,6 +3,7 @@ package umc.parasol.domain.auth.presentation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import umc.parasol.domain.auth.application.AuthSignService;
 import umc.parasol.domain.auth.application.AuthTokenService;
 import umc.parasol.domain.auth.dto.*;
+import umc.parasol.domain.member.dto.UpdateRoleReq;
+import umc.parasol.domain.shop.dto.ShopReq;
+import umc.parasol.domain.shop.dto.ShopRes;
 import umc.parasol.domain.verify.dto.CheckReq;
 import umc.parasol.domain.verify.dto.VerifyResponse;
 import umc.parasol.global.config.security.token.CurrentUser;
@@ -76,6 +80,33 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+    // 애플 로그인
+    @PostMapping("/apple")
+    public ResponseEntity<?> appleLogin(@RequestBody AppleReq req) {
+        AuthRes authRes = authService.appleLogin(req);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(authRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    // 역할 설정 (애플 로그인 후)
+    @PostMapping("/apple/role")
+    public ResponseEntity<?> appleRoleUpdate(@RequestBody UpdateRoleReq req, @CurrentUser User user) {
+        String name = user.getUsername();
+        return ResponseEntity.ok(authService.updateRole(name, req));
+    }
+
+    // 애플 로그인 후 만약 OWNER 였다면 매장 정보 업데이트..
+    @PostMapping("/apple/owner")
+    public ResponseEntity<?> appleShopAdd(@RequestBody ShopReq req, @CurrentUser User user) {
+        String name = user.getUsername();
+        return ResponseEntity.ok(authService.createNewShop(name, req));
     }
 
     //로그아웃

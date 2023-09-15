@@ -25,21 +25,30 @@ public class Shop extends BaseEntity {
     @Column(name = "shop_id")
     private Long id;
 
-    @NotNull(message = "위도가 설정되어 있어야 합니다.")
     private BigDecimal latitude;
 
-    @NotNull(message = "경도가 설정되어 있어야 합니다.")
     private BigDecimal longitude;
 
-    @NotBlank(message = "도로명 주소를 입력해야 합니다.")
     private String roadNameAddress;
 
-    @NotBlank(message = "지점 이름이 설정되어 있어야 합니다.")
     private String name;
 
     private String description;
 
     public void updateDescription(String description) {
         this.description = description;
+    }
+
+    public void updateLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+    public void updateLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+    public void updateRoadNameAddress(String address) {
+        this.roadNameAddress = address;
+    }
+    public void updateName(String name) {
+        this.name = name;
     }
 }

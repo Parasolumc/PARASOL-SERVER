@@ -1,5 +1,6 @@
 package umc.parasol.domain.auth.application;
 
+import devholic.library.oauth2.apple.AppleTokenAgent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,11 +15,13 @@ import umc.parasol.domain.member.domain.AuthRole;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.member.dto.UpdateRoleReq;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.shop.domain.repository.ShopRepository;
+import umc.parasol.domain.shop.dto.ShopReq;
+import umc.parasol.domain.shop.dto.ShopRes;
 import umc.parasol.domain.verify.application.VerifyService;
 import umc.parasol.domain.verify.dto.CheckReq;
-import umc.parasol.domain.verify.dto.VerifyReq;
 import umc.parasol.domain.verify.dto.VerifyResponse;
 import umc.parasol.global.DefaultAssert;
 
@@ -114,18 +117,40 @@ public class AuthSignService {
 
         TokenMapping tokenMapping = customTokenProviderService.createToken(authentication);
 
-        Token token = Token.builder()
-                .refreshToken(tokenMapping.getRefreshToken())
-                .userEmail(tokenMapping.getUserEmail())
-                .build();
+        Token token = createTokenFromTokenMapping(tokenMapping);
 
         tokenRepository.save(token);
 
+        return createAuthRes(tokenMapping, findMember);
+    }
+
+    // 애플 소셜 로그인
+    @Transactional
+    public AuthRes appleLogin(AppleReq req) {
+        String email = AppleTokenAgent.getUserResource(req.getToken());
+        Member targetMember = memberRepository.findByEmail(email).orElseGet(
+                () -> createSocialMember(email)
+        );
+
+        TokenMapping tokenMapping = customTokenProviderService.createAppleToken(targetMember.getId(), email);
+        Token token = createTokenFromTokenMapping(tokenMapping);
+        tokenRepository.save(token);
+        return createAuthRes(tokenMapping, targetMember);
+    }
+
+    private static AuthRes createAuthRes(TokenMapping tokenMapping, Member targetMember) {
         return AuthRes.builder()
                 .accessToken(tokenMapping.getAccessToken())
                 .refreshToken(tokenMapping.getRefreshToken())
-                .role(findMember.getRole())
-                .memberId(findMember.getId())
+                .role(targetMember.getRole())
+                .memberId(targetMember.getId())
+                .build();
+    }
+
+    private static Token createTokenFromTokenMapping(TokenMapping tokenMapping) {
+        return Token.builder()
+                .refreshToken(tokenMapping.getRefreshToken())
+                .userEmail(tokenMapping.getUserEmail())
                 .build();
     }
 
@@ -157,5 +182,56 @@ public class AuthSignService {
         Member member = memberRepository.findByPhoneNumber(checkReq.getPhoneNumber())
                 .orElseThrow(() -> new IllegalStateException("등록되지 않은 전화번호 입니다."));
         return RecoveryRes.from(member.getId(), member.getEmail());
+    }
+
+    @Transactional
+    public Member createSocialMember(String email) {
+        Member member = Member.builder()
+                .nickname(email)
+                .email(email)
+                .password("")
+                .role(null)
+                .authRole(AuthRole.USER)
+                .isVerified(Boolean.FALSE)
+                .build();
+        return memberRepository.save(member);
+    }
+
+    // 역할 설정
+    @Transactional
+    public String updateRole(String name, UpdateRoleReq req) {
+        Member targetMember = memberRepository.findByName(name)
+                .orElseThrow(() -> new IllegalStateException("member not found"));
+        targetMember.updateRole(req.getRole());
+        if (req.getRole().equals("OWNER")) {
+            Shop newShop = new Shop();
+            Shop saveShop = shopRepository.save(newShop);
+            targetMember.updateShop(saveShop);
+        }
+        return "변경 완료";
+    }
+
+    // 역할 설정 후 만약 점주로 바꿀 것이었다면
+    @Transactional
+    public ShopRes createNewShop(String name, ShopReq req) {
+        Member targetMember = memberRepository.findByName(name)
+                .orElseThrow(() -> new IllegalStateException("member not found"));
+        Shop targetShop = targetMember.getShop();
+
+        targetShop.updateName(req.getShopName());
+        targetShop.updateLatitude(req.getLatitude());
+        targetShop.updateLongitude(req.getLongitude());
+        targetShop.updateRoadNameAddress(req.getRoadNameAddress());
+        targetShop.updateDescription(req.getDesc());
+
+        ShopRes result = ShopRes.builder()
+                .latitude(targetShop.getLatitude())
+                .longitude(targetShop.getLongitude())
+                .shopName(targetShop.getName())
+                .roadNameAddress(targetShop.getRoadNameAddress())
+                .id(targetShop.getId())
+                .build();
+
+        return result;
     }
 }
