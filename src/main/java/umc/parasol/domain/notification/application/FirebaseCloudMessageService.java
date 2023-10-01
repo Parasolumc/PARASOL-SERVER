@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.stereotype.Component;
@@ -16,10 +18,16 @@ import umc.parasol.global.config.security.token.UserPrincipal;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class FirebaseCloudMessageService {
-    private final String API_URL = "https://fcm.googleapis.com/v1/projects/parasol-bcbf5/messages:send";
+    @Value("${fcm.key.path}")
+    private String SERVICE_ACCOUNT_JSON;
+
+    @Value("${fcm.api.url}")
+    private String FCM_API_URL;
+
     private final ObjectMapper objectMapper;
     private final MemberRepository memberRepository;
 
@@ -37,7 +45,7 @@ public class FirebaseCloudMessageService {
         OkHttpClient client = new OkHttpClient();
         okhttp3.RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(FCM_API_URL)
                 .post(requestBody)
                 .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
@@ -45,6 +53,9 @@ public class FirebaseCloudMessageService {
 
         Response response = client.newCall(request)
                 .execute();
+
+        log.info("알림 전송 성공 ! successCount: 1 messages were sent successfully");
+        log.info("알림 전송: {}", response.body().string());
 
     }
 
@@ -72,7 +83,8 @@ public class FirebaseCloudMessageService {
                 .validate_only(false)
                 .build();
 
-
+        log.info("메세지 생성 성공 ! successCount: 1 messages were made successfully");
+        log.info("메세지 생성: title-{}, body-{}, token-{}", fcmMessage.getMessage().getNotification().getTitle(), fcmMessage.getMessage().getNotification().getBody(), fcmMessage.getMessage().getToken());
         return objectMapper.writeValueAsString(fcmMessage);
     }
 
@@ -82,13 +94,14 @@ public class FirebaseCloudMessageService {
      * @throws IOException
      */
     private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "firebase/firebase_service_key.json";
+        String firebaseConfigPath = SERVICE_ACCOUNT_JSON;
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshIfExpired();
+        log.info("getAccessToken() - googleCredentials: {} ", googleCredentials.getAccessToken().getTokenValue());
 
         return googleCredentials.getAccessToken().getTokenValue();
     }
@@ -116,7 +129,6 @@ public class FirebaseCloudMessageService {
                 () -> new IllegalStateException("해당 member가 없습니다.")
         );
     }
-
 
 }
 
