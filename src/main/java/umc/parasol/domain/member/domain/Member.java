@@ -1,13 +1,27 @@
 package umc.parasol.domain.member.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import umc.parasol.domain.common.BaseEntity;
 import umc.parasol.domain.shop.domain.Shop;
+
+import java.util.UUID;
 
 @Entity
 @Builder
@@ -56,15 +70,26 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
+
+    // 토스 페이먼츠에 사용할 CUSTOMER_KEY (UUID)
+    private UUID tossCustomerKey;
+
     @Column(name = "fcm_token")
     private String fcmToken; // FCM 토큰
 
+
     // update 메서드
-    public void updateNickname(String nickname){this.nickname = nickname;}
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
-    public void updatePassword(String password){this.password = password;}
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 
-    public void updateIsVerified(Boolean isVerified) {this.isVerified = isVerified;}
+    public void updateIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
 
     public void updatePhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
