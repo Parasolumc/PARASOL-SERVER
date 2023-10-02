@@ -13,6 +13,7 @@ import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Builder
@@ -47,6 +48,9 @@ public class History extends BaseEntity {
 
     @NotNull(message = "가격이 설정되어 있어야 합니다.")
     private int cost;
+
+    // 토스 페이먼츠에 사용할 ORDER_ID (UUID)
+    private UUID tossOrderId = UUID.randomUUID();
     
     @Enumerated(EnumType.STRING)
     @NotNull(message = "절차가 설정되어 있어야 합니다.")
