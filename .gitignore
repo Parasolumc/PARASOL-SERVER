@@ -46,3 +46,4 @@ out/
 application.yml
 /src/main/resources/database/application-database.yml
 /src/main/resources/auth/application-auth.yml
+ 
