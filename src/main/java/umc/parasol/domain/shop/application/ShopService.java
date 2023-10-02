@@ -13,6 +13,7 @@ import umc.parasol.domain.image.domain.repository.ImageRepository;
 import umc.parasol.domain.image.dto.ImageRes;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.notification.application.FirebaseCloudMessageService;
 import umc.parasol.domain.notification.application.NotificationService;
 import umc.parasol.domain.notification.domain.Notification;
 import umc.parasol.domain.notification.domain.NotificationType;
@@ -32,6 +33,7 @@ import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +57,8 @@ public class ShopService {
     private final TimeTableRepository timeTableRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
+
+    private final FirebaseCloudMessageService firebaseCloudMessageService;
 
     /**
      * 매장 리스트 조회
@@ -221,18 +225,27 @@ public class ShopService {
      * 우산 대여 처리
      * @param user api 호출하는 사용자 객체 (점주)
      * @param memberId 대여자 객체
+     * @param shopId url에 담긴 손님이 선택한 매장 id
      */
     @Transactional
-    public ApiResponse rentalUmbrella(@CurrentUser UserPrincipal user, Long memberId) {
+    public ApiResponse rentalUmbrella(@CurrentUser UserPrincipal user, Long memberId, Long shopId) throws IOException {
 
         Member owner = findValidMember(user.getId()); //점주
         Shop targetShop = findValidShopForOwner(owner); //점주의 shop
 
         Member member = findValidMember(memberId); //대여자
 
+        //손님이 선택한 매장 맞는지 검증
+        if(targetShop.getId() != shopId) {
+            throw new IllegalStateException("손님이 선택한 매장이 아닙니다.");
+        }
+
         History history = rentalUmbrella(targetShop, member);
         historyRepository.save(history);
 
+
+        // 대여자에게 푸시 알림 전송
+        firebaseCloudMessageService.sendMessageTo(member.getFcmToken(), targetShop.getName() , "대여를 완료했어요!");
 
         //알림 생성
         Notification notification = notificationService.makeNotification(targetShop, member, NotificationType.RENT_COMPLETED);
@@ -246,13 +259,19 @@ public class ShopService {
      * 우산 반납 처리
      * @param user api 호출하는 사용자 객체 (점주)
      * @param memberId 대여자 객체
+     * @param shopId 손님이 선택한 매장 id
      */
     @Transactional
-    public ApiResponse returnUmbrella(@CurrentUser UserPrincipal user, Long memberId) {
+    public ApiResponse returnUmbrella(@CurrentUser UserPrincipal user, Long memberId, Long shopId) throws IOException {
         Member owner = findValidMember(user.getId()); //점주
         Shop targetShop = findValidShopForOwner(owner); //점주의 shop
 
         Member member = findValidMember(memberId); //대여자
+
+        //손님이 선택한 매장 맞는지 검증
+        if(targetShop.getId() != shopId) {
+            throw new IllegalStateException("손님이 선택한 매장이 아닙니다.");
+        }
 
         List<History> remainHistoryList = historyRepository.findAllByMemberOrderByCreatedAtDesc(member)
                 .stream()
@@ -276,6 +295,9 @@ public class ShopService {
         targetHistory.updateEndShop(targetShop);
         HistoryRes record = makeHistoryRes(member, targetHistory, targetShop);
 
+
+        // 반납자에게 푸시 알림 전송
+        firebaseCloudMessageService.sendMessageTo(member.getFcmToken(), targetShop.getName() , "반납을 완료했어요!");
 
         //알림 생성
         Notification notification = notificationService.makeNotification(targetShop, member, NotificationType.RETURN_COMPLETED);

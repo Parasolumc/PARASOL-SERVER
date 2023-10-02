@@ -17,12 +17,13 @@ public class SellController {
     private final SellService sellService;
 
     // 우산 판매
-    @PostMapping("/{id}")
+    @PostMapping("/{userId}/{shopId}")
     public ResponseEntity<?> sellUmbrella(
             @CurrentUser UserPrincipal userPrincipal,
-            @PathVariable(value = "id") Long memberId) {
+            @PathVariable(value = "userId") Long memberId,
+            @PathVariable Long shopId) {
 
-        SellResultRes sellResultRes = sellService.sellUmbrella(userPrincipal, memberId);
+        SellResultRes sellResultRes = sellService.sellUmbrella(userPrincipal, memberId, shopId);
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)

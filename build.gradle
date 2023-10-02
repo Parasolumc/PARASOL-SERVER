@@ -33,6 +33,9 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'com.google.firebase:firebase-admin:8.0.0'  // 최신 버전 사용
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
+
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'

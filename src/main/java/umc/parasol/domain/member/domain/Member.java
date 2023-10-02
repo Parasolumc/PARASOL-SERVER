@@ -62,7 +62,6 @@ public class Member extends BaseEntity {
     // 인증 관련 필드
     @NotNull(message = "인증 여부가 설정되어 있어야 합니다.")
     private Boolean isVerified;
-
     private String name;
 
     private String phoneNumber;
@@ -71,8 +70,13 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
+
     // 토스 페이먼츠에 사용할 CUSTOMER_KEY (UUID)
     private UUID tossCustomerKey;
+
+    @Column(name = "fcm_token")
+    private String fcmToken; // FCM 토큰
+
 
     // update 메서드
     public void updateNickname(String nickname) {
@@ -93,5 +97,9 @@ public class Member extends BaseEntity {
 
     public void updateName(String name) {
         this.name = name;
+    }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }
