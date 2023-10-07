@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.auth.domain.Token;
 import umc.parasol.domain.auth.domain.repository.TokenRepository;
+import umc.parasol.domain.auth.dto.AppleReq;
 import umc.parasol.domain.auth.dto.AuthRes;
 import umc.parasol.domain.auth.dto.RecoveryReq;
 import umc.parasol.domain.auth.dto.RecoveryRes;
@@ -198,6 +199,7 @@ public class AuthSignService {
     public Member createSocialMember(String email) {
         Member member = Member.builder()
                 .nickname(email)
+                .name(email)
                 .email(email)
                 .password("")
                 .role(null)
