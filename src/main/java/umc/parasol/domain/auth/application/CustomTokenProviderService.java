@@ -97,6 +97,31 @@ public class CustomTokenProviderService {
                 .build();
     }
 
+    public TokenMapping createAppleToken(Long id, String email) {
+        Date now = new Date();
+        Date accessTokenExpiresIn = new Date(now.getTime() + OAuth2Config.getAuth().getAccessTokenExpirationMsec());
+        Date refreshTokenExpiresIn = new Date(now.getTime() + OAuth2Config.getAuth().getRefreshTokenExpirationMsec());
+        String secretKey = OAuth2Config.getAuth().getTokenSecret();
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        Key key = Keys.hmacShaKeyFor(keyBytes);
+        String accessToken = Jwts.builder()
+                .setSubject(Long.toString(id))
+                .setIssuedAt(new Date())
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+        String refreshToken = Jwts.builder()
+                .setExpiration(refreshTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+
+        return TokenMapping.builder()
+                .userEmail(email)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(OAuth2Config.getAuth().getTokenSecret())

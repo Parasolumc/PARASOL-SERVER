@@ -90,7 +90,7 @@ public class MemberService {
     }
 
     @Transactional
-    void validateIsOwnerAndDeleteMember(Member targetMember) {
+    public void validateIsOwnerAndDeleteMember(Member targetMember) {
         if (isOwner(targetMember)) {
             // 해당 Shop으로 등록된 사용중인 우산이 없어야 함
             Shop targetShop = targetMember.getShop();
@@ -102,7 +102,7 @@ public class MemberService {
     }
 
     @Transactional
-    void validateIsCustomerAndDeleteMember(Member targetMember) {
+    public void validateIsCustomerAndDeleteMember(Member targetMember) {
         if (isCustomer(targetMember)) {
             List<History> histories = historyRepository.findAllByMember(targetMember);
             validateIsEmptyUseStateHistory(histories);
