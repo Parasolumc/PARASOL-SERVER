@@ -14,10 +14,12 @@ import umc.parasol.domain.history.domain.repository.HistoryRepository;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.Role;
 import umc.parasol.domain.member.domain.repository.MemberRepository;
+import umc.parasol.domain.member.dto.GetCustomerKeyRes;
 import umc.parasol.domain.member.dto.UpdatePwReq;
 import umc.parasol.domain.shop.domain.Shop;
 import umc.parasol.domain.umbrella.domain.Umbrella;
 import umc.parasol.domain.umbrella.domain.repository.UmbrellaRepository;
+import umc.parasol.global.DefaultAssert;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
@@ -79,6 +81,12 @@ public class MemberService {
 
         targetMember.updateStatus(Status.DELETE);
         return new ApiResponse(true, "탈퇴 완료");
+    }
+
+    // CUSTOMER_KEY 발급 (toss payments)
+    public GetCustomerKeyRes getCustomerKey(UserPrincipal userPrincipal) {
+        Member member = findMemberById(userPrincipal.getId());
+        return GetCustomerKeyRes.builder().customerKey(member.getTossCustomerKey()).build();
     }
 
     @Transactional

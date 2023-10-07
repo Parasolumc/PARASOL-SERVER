@@ -10,7 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.parasol.domain.auth.domain.Token;
 import umc.parasol.domain.auth.domain.repository.TokenRepository;
-import umc.parasol.domain.auth.dto.*;
+import umc.parasol.domain.auth.dto.AuthRes;
+import umc.parasol.domain.auth.dto.RecoveryReq;
+import umc.parasol.domain.auth.dto.RecoveryRes;
+import umc.parasol.domain.auth.dto.RefreshTokenReq;
+import umc.parasol.domain.auth.dto.SignInReq;
+import umc.parasol.domain.auth.dto.SignUpCustomerReq;
+import umc.parasol.domain.auth.dto.SignUpOwnerReq;
+import umc.parasol.domain.auth.dto.TokenMapping;
 import umc.parasol.domain.member.domain.AuthRole;
 import umc.parasol.domain.member.domain.Member;
 import umc.parasol.domain.member.domain.Role;
@@ -26,6 +33,7 @@ import umc.parasol.domain.verify.dto.VerifyResponse;
 import umc.parasol.global.DefaultAssert;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +67,7 @@ public class AuthSignService {
                 .role(Role.CUSTOMER)
                 .authRole(AuthRole.USER)
                 .isVerified(Boolean.FALSE)
+                .tossCustomerKey(UUID.randomUUID())
                 .build();
 
         memberRepository.save(member);
@@ -90,6 +99,7 @@ public class AuthSignService {
                 .authRole(AuthRole.USER)
                 .isVerified(Boolean.FALSE)
                 .shop(newShop)
+                .tossCustomerKey(UUID.randomUUID())
                 .build();
 
         memberRepository.save(member);
@@ -100,7 +110,7 @@ public class AuthSignService {
 
     //로그인
     @Transactional
-    public AuthRes signIn(SignInReq signInReq){
+    public AuthRes signIn(SignInReq signInReq) {
         Optional<Member> member = memberRepository.findByEmail(signInReq.getEmail());
         DefaultAssert.isTrue(member.isPresent(), "유저가 올바르지 않습니다.");
 
@@ -156,7 +166,7 @@ public class AuthSignService {
 
     //로그아웃
     @Transactional
-    public void signOut(RefreshTokenReq refreshTokenReq){
+    public void signOut(RefreshTokenReq refreshTokenReq) {
 
         Optional<Token> token = tokenRepository.findByRefreshToken(refreshTokenReq.getRefreshToken());
         DefaultAssert.isTrue(token.isPresent(), "이미 로그아웃 되었습니다");
