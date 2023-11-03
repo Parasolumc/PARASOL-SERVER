@@ -16,6 +16,7 @@ import umc.parasol.domain.notification.domain.FcmMessage;
 import umc.parasol.global.config.security.token.UserPrincipal;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 @Slf4j
@@ -97,7 +98,7 @@ public class FirebaseCloudMessageService {
         String firebaseConfigPath = SERVICE_ACCOUNT_JSON;
 
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
+                .fromStream(new URL(firebaseConfigPath).openStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshIfExpired();
