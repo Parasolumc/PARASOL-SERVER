@@ -331,5 +331,4 @@ public class ShopService {
                 .umbrella(umbrellaService.getAnyFreeUmbrella(targetShop))
                 .build();
     }
-
 }
