@@ -17,6 +17,7 @@ import umc.parasol.global.infrastructure.S3Uploader;
 import umc.parasol.global.payload.ApiResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @Transactional
@@ -37,6 +38,29 @@ public class ImageService {
         return ApiResponse.builder()
                 .check(true)
                 .information(new ImageRes(storedImage.getId(), storedImage.getUrl()))
+                .build();
+    }
+
+    public ApiResponse uploadImages(List<MultipartFile> images, UserPrincipal user) throws Exception {
+        List<Image> storedImages = null;
+        for(MultipartFile image: images) {
+            String storedFileUrl = s3Uploader.outerUpload(image, "shop", user);
+            Member owner = memberRepository.findById(user.getId())
+                    .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
+            Shop targetShop = owner.getShop();
+            Image storedImage = createImageEntity(storedFileUrl, targetShop.getId());
+            storedImages.add(storedImage);
+        }
+
+        List<ImageRes> imageResList = null;
+        for(Image image: storedImages) {
+           imageResList.add(new ImageRes(image.getId(), image.getUrl()));
+        }
+
+        return ApiResponse.builder()
+                .check(true)
+                .information(imageResList)
+                //.information(new ImageRes(storedImage.getId(), storedImage.getUrl()))
                 .build();
     }
 
