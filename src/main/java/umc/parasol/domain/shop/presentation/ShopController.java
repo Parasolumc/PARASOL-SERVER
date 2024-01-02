@@ -13,6 +13,7 @@ import umc.parasol.global.config.security.token.CurrentUser;
 import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
+import javax.print.attribute.standard.Media;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -81,6 +82,17 @@ public class ShopController {
                                          MultipartFile file, @CurrentUser UserPrincipal user) {
         try {
             return ResponseEntity.ok(imageService.upload(file, user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 매장 사진 (여러장) 업로드
+    @PostMapping(value = "/shop/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> imagesUpload(@RequestParam(value = "image") List<MultipartFile> files,
+                                          @CurrentUser UserPrincipal user) {
+        try {
+            return ResponseEntity.ok(imageService.uploadImages(files, user));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
