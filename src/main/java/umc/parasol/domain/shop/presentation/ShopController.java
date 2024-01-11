@@ -14,6 +14,7 @@ import umc.parasol.global.config.security.token.UserPrincipal;
 import umc.parasol.global.payload.ApiResponse;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -78,19 +79,20 @@ public class ShopController {
     // 매장 사진 업로드
     @PostMapping(value = "/shop/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> imageUpload(@RequestParam(value = "image")
-                                         MultipartFile file, @CurrentUser UserPrincipal user) {
+                                         List<MultipartFile> files, @CurrentUser UserPrincipal user) {
         try {
-            return ResponseEntity.ok(imageService.upload(file, user));
+            return ResponseEntity.ok(imageService.upload(files, user));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     // 매장 사진 삭제
-    @DeleteMapping("/shop/image/{id}")
-    public ResponseEntity<?> imageDelete(@PathVariable Long id, @CurrentUser UserPrincipal user) {
+    @DeleteMapping("/shop/image/{ids}")
+    public ResponseEntity<?> imageDelete(@PathVariable String ids, @CurrentUser UserPrincipal user) {
         try {
-            return ResponseEntity.ok(imageService.delete(id, user));
+            return ResponseEntity.ok(imageService.deleteMultiple(ids, user));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

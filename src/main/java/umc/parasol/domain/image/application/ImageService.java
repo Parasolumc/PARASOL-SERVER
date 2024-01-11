@@ -17,6 +17,8 @@ import umc.parasol.global.infrastructure.S3Uploader;
 import umc.parasol.global.payload.ApiResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -27,16 +29,21 @@ public class ImageService {
     private final MemberRepository memberRepository;
     private final S3Uploader s3Uploader;
 
-    public ApiResponse upload(MultipartFile file, UserPrincipal user) throws Exception {
-        String storedFileUrl = s3Uploader.outerUpload(file, "shop", user);
-        Member owner = memberRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
-        Shop targetShop = owner.getShop();
-        Image storedImage = createImageEntity(storedFileUrl, targetShop.getId());
+    public ApiResponse upload(List<MultipartFile> files, UserPrincipal user) throws Exception {
+        List<ImageRes> uploadImages = new ArrayList<>();
+
+        for(MultipartFile file : files){
+            String storedFileUrl = s3Uploader.outerUpload(file, "shop", user);
+            Member owner = memberRepository.findById(user.getId())
+                    .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
+            Shop targetShop = owner.getShop();
+            Image storedImage = createImageEntity(storedFileUrl, targetShop.getId());
+            uploadImages.add(new ImageRes(storedImage.getId(), storedImage.getUrl()));
+        }
 
         return ApiResponse.builder()
                 .check(true)
-                .information(new ImageRes(storedImage.getId(), storedImage.getUrl()))
+                .information(uploadImages)
                 .build();
     }
 
@@ -78,4 +85,14 @@ public class ImageService {
 
         return "삭제 완료";
     }
+
+    @Transactional
+    public String deleteMultiple(String ids, UserPrincipal user) {
+        String[] idArr = ids.split(",");
+        for (String id : idArr) {
+            delete(Long.valueOf(id), user);
+        }
+        return "삭제 완료";
+    }
+
 }
