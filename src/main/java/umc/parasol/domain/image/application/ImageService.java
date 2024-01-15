@@ -31,12 +31,11 @@ public class ImageService {
 
     public ApiResponse upload(List<MultipartFile> files, UserPrincipal user) throws Exception {
         List<ImageRes> uploadImages = new ArrayList<>();
-
+        Member owner = memberRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
+        Shop targetShop = owner.getShop();
         for(MultipartFile file : files){
             String storedFileUrl = s3Uploader.outerUpload(file, "shop", user);
-            Member owner = memberRepository.findById(user.getId())
-                    .orElseThrow(() -> new IllegalStateException("해당 member가 없습니다."));
-            Shop targetShop = owner.getShop();
             Image storedImage = createImageEntity(storedFileUrl, targetShop.getId());
             uploadImages.add(new ImageRes(storedImage.getId(), storedImage.getUrl()));
         }
